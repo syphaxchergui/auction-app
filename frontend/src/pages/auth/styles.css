@@ -1,0 +1,25 @@
+.l-bg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.l-containter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  height: 500px;
+  width: 350px;
+  border-radius: 5px;
+  background-color: #fff;
+}
+
+.l-title {
+  margin-bottom: 2em;
+}
+
+a {
+  color: rgb(21, 101, 192);
+}
