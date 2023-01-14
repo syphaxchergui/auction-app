@@ -13,6 +13,8 @@ import "./styles.css";
 import { validateEmail } from "../../utils/helpers";
 import { useAuth } from "../../state/context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { LoadingButton } from "@mui/lab";
+import { PRIMARY } from "../../constant/colors";
 
 const LoginForm = () => {
   const { loading, actions, error: authError } = useAuth();
@@ -114,15 +116,29 @@ const LoginForm = () => {
           </FormHelperText>
         </FormControl>
       </>
+      {authError ? (
+        <p
+          style={{
+            width: 200,
+            textAlign: "center",
+            textTransform: "capitalize",
+            color: PRIMARY,
+          }}
+        >
+          {authError}
+        </p>
+      ) : null}
 
-      <Button
+      <LoadingButton
         sx={{ marginTop: "4em", height: 46 }}
         variant="contained"
         fullWidth
+        loading={loading}
         onClick={handleSubmit}
+        disableElevation
       >
         Login
-      </Button>
+      </LoadingButton>
     </div>
   );
 };

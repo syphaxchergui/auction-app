@@ -1,22 +1,62 @@
 import ItemDetails from "../../components/itemDetails";
 import "./styles.css";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-
 import { Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import UserBid from "../../components/userBids";
+import { useNotifications } from "../../state/context/NotificationContext";
+import { useEffect, useState } from "react";
+import Loading from "../loading";
+import ApiMiddleware from "../../core/API";
+import {
+  PRIMARY_LIGHT_1,
+  PRIMARY_LIGHT_2,
+  PRIMARY_LIGHT_3,
+} from "../../constant/colors";
 
 const ItemPage = () => {
+  const params = useParams();
+  const { actions: notify } = useNotifications();
+
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      setLoading(true);
+      const result = await ApiMiddleware.get(`/items/${params?.slug}`);
+      if (result.data?.success) {
+        setData(result?.data?.item);
+      } else {
+        notify?.error(result?.data?.message);
+      }
+      setLoading(false);
+    } catch (err) {
+      notify?.error(err?.response?.data?.message || err.message);
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <Loading />;
+
+  if (!data) return <h1>Error !</h1>;
+
   return (
     <>
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
-        <Link to="/">Items</Link>
-        <Typography color="text.primary">Product no1</Typography>
+        <Link to="/" style={{ textDecoration: "none", color: PRIMARY_LIGHT_1 }}>
+          Items
+        </Link>
+        <Typography color="text.primary">{data?.title}</Typography>
       </Breadcrumbs>
 
-      <ItemDetails />
+      <ItemDetails item={data} />
 
-      <UserBid />
+      <UserBid itemId={data?._id} />
     </>
   );
 };

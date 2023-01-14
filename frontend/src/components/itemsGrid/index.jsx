@@ -2,7 +2,7 @@ import { Grid, Pagination } from "@mui/material";
 import { Box } from "@mui/system";
 import Item from "../item";
 
-const ItemsGrid = () => {
+const ItemsGrid = ({ items }) => {
   return (
     <Box
       sx={{
@@ -12,26 +12,21 @@ const ItemsGrid = () => {
         alignItems: "center",
       }}
     >
-      <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
+      {items.length > 0 ? (
+        <Grid container spacing={2}>
+          {items?.map((item) => (
+            <Grid item xs={12} sm={6} md={3}>
+              <Item
+                id={item?._id}
+                slug={item?.slug}
+                title={item?.title}
+                minBid={item?.minBid}
+                image={item?.image}
+              />
+            </Grid>
+          ))}
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <Item />
-        </Grid>
-      </Grid>
+      ) : null}
       <Pagination
         sx={{ my: 6 }}
         count={10}

@@ -1,5 +1,7 @@
 import express from "express";
 import cors from "cors";
+import compression from "compression";
+import helmet from "helmet";
 import dotenv from "dotenv";
 import routes from "./routes/index.js";
 import mongoose from "mongoose";
@@ -12,7 +14,13 @@ const url = process.env.URL;
 
 const app = express();
 
+// for payload compression
+app.use(compression());
+// for api security
+app.use(helmet());
+// for cross origin security
 app.use(cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

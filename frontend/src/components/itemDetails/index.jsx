@@ -1,23 +1,34 @@
 import { Button, Grid, TextField } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Countdown from "react-countdown";
+
 import "./styles.css";
 
-const ItemDetails = () => {
+const renderer = ({ days, hours, minutes, seconds, completed }) => {
+  if (completed) {
+    // Render a completed state
+    return <span>Bid finished</span>;
+  } else {
+    // Render a countdown
+    return (
+      <span>
+        {days}d {hours}h {minutes}m {seconds}s
+      </span>
+    );
+  }
+};
+
+const ItemDetails = ({ item }) => {
   return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} md={6}>
-        <img
-          className="item-d-img"
-          src={
-            "https://cdn.pixabay.com/photo/2022/11/14/20/14/compass-7592447_960_720.jpg"
-          }
-        />
+    <Grid container columnSpacing={5}>
+      <Grid item xs={12} md={5}>
+        <img className="item-d-img" alt={item?.title} src={item?.image} />
       </Grid>
 
       <Grid
         item
         xs={12}
-        md={6}
+        md={7}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -25,21 +36,25 @@ const ItemDetails = () => {
         }}
       >
         <div>
-          <h1 className="item-d-title">Product 1</h1>
-          <p className="item-d-subtitle">Description</p>
-          <p className="item-d-description">
-            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aspernatur
-            soluta eos illo autem reiciendis ea? Repellat molestiae nisi et
-            velit impedit dolores temporibus a obcaecati, eaque dicta sed
-            dignissimos
-          </p>
           <div className="item-d-time-container">
             <p className="item-d-subtitle-time">Time remaining</p>
-            <h1 className="item-d-time"> 0d 1h 23m 45s</h1>
+            {/* <h1 className="item-d-time"> 0d 1h 23m 45s</h1> */}
+            <h1 className="item-d-time">
+              <Countdown
+                renderer={renderer}
+                date={new Date(new Date(item?.expirationDate))}
+              />
+            </h1>
+            <p className="item-d-time-finish">
+              Finish date {new Date(item?.expirationDate).toLocaleString()}
+            </p>
           </div>
+          <h1 className="item-d-title">{item?.title}</h1>
+          <p className="item-d-subtitle">Description</p>
+          <p className="item-d-description">{item?.description}</p>
+
           <Grid container>
             <Grid item xs={6}>
-              {" "}
               <p className="item-d-subtitle">Highest bid</p>
               <h1 className="item-d-bid">
                 <span className="item-d-bid-dollar">$ </span>350
@@ -55,8 +70,16 @@ const ItemDetails = () => {
           </Grid>
         </div>
         <div className="item-d-bottom-section">
-          <TextField fullWidth size="midium" placeholder="Min bid: $ 12" />
-          <Button sx={{ width: 200, ml: 2, height: 56 }} variant="contained">
+          <TextField
+            fullWidth
+            size="midium"
+            placeholder={`Min bid: $${item?.minBid}`}
+          />
+          <Button
+            disableElevation
+            sx={{ width: 200, ml: 2, height: 56 }}
+            variant="contained"
+          >
             Place Bid
           </Button>
         </div>

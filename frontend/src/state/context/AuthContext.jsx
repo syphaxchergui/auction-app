@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ApiMiddleware from "../../core/API";
 import useToken from "../../hooks/useToken";
+import { useNotifications } from "./NotificationContext";
 
 const initialState = {
   user: null,
@@ -16,20 +18,14 @@ const AuthContext = React.createContext(initialState);
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState(initialState);
   const [storedToken, storeToken] = useToken("_token");
+  const { actions: notify } = useNotifications();
 
   useEffect(() => {
     if (!state.loggedin) storeToken({ user: undefined, token: undefined });
     else storeToken({ user: state.user, token: state.token });
-
-    console.log(state);
   }, [state.loggedin]);
 
-  // useEffect(() => {
-  //   if (state.loggedin) storeToken({ user: state.user, token: state.token });
-  //   else storeToken(undefined);
-  // }, [state.loggedin]);
-
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (storedToken?.user == undefined && storedToken?.token == undefined)
       setState({ ...state, loggedin: false, error: "" });
     else setState({ ...storedToken, loggedin: true, error: "" });
@@ -43,27 +39,46 @@ export const AuthProvider = ({ children }) => {
       loading: true,
     });
     try {
-      const data = {
-        user: {
-          userName: "user 1",
-          email: email,
-          role: "ADMIN",
-        },
-        token: "asdghjdsafkjkjfdhjhjflkjdsahj",
-      };
-      setState({
-        ...state,
-        ...data,
-        loading: false,
-        loggedin: true,
+      // const data = {
+      //   user: {
+      //     userName: "user 1",
+      //     email: email,
+      //     role: "ADMIN",
+      //   },
+      //   token: "asdghjdsafkjkjfdhjhjflkjdsahj",
+      // };
+      const result = await ApiMiddleware.post("/auth/login", {
+        email,
+        password,
       });
+
+      if (result.data.success) {
+        setState({
+          ...state,
+          user: result.data.user,
+          token: result.data.token,
+          loading: false,
+          loggedin: true,
+          error: "",
+        });
+      } else {
+        notify?.error(result.data.message);
+        setState({
+          ...state,
+          loading: false,
+          loggedin: false,
+          error: result.data.message,
+        });
+      }
     } catch (err) {
+      // console.log(err);
       setState({
         ...state,
         loading: false,
         loggedin: false,
-        error: err.message,
+        error: err?.response?.data?.message || err.message,
       });
+      notify?.error(err?.response?.data?.message || err.message);
     }
   };
 

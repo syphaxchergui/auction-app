@@ -30,6 +30,7 @@ function CustomAppBar() {
 
   return (
     <AppBar
+      elevation={0}
       position="static"
       color="transparent"
       sx={{

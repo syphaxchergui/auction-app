@@ -16,6 +16,7 @@ import { AuthProvider, useAuth } from "./state/context/AuthContext.jsx";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { PRIMARY } from "./constant/colors";
 import { UserProvider } from "./state/context/UserContext";
+import NotificationProvider from "./state/context/NotificationContext";
 
 const primaryTheme = createTheme({
   palette: {
@@ -26,7 +27,6 @@ const primaryTheme = createTheme({
       main: "#000",
     },
   },
-  shadows: "none",
 });
 
 function isMustLoginFirst({ loggedin, userRole }) {
@@ -43,6 +43,17 @@ const App = () => {
 
   if (mustLogin) return <Login />;
 
+  if (user?.role === "ADMIN")
+    return (
+      <Routes>
+        <Route exact path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="/items/:slug" element={<ItemPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    );
+
   return (
     <Routes>
       <Route exact path="/" element={<Layout />}>
@@ -57,11 +68,13 @@ const App = () => {
 export default () => (
   <BrowserRouter>
     <ThemeProvider theme={primaryTheme}>
-      <AuthProvider>
-        <UserProvider>
-          <App />
-        </UserProvider>
-      </AuthProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <UserProvider>
+            <App />
+          </UserProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </ThemeProvider>
   </BrowserRouter>
 );
