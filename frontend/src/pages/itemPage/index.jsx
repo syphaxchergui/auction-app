@@ -20,6 +20,7 @@ const ItemPage = () => {
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
+  const [maxBid, setMaxBid] = useState(null);
 
   useEffect(() => {
     getData();
@@ -30,7 +31,8 @@ const ItemPage = () => {
       setLoading(true);
       const result = await ApiMiddleware.get(`/items/${params?.slug}`);
       if (result.data?.success) {
-        setData(result?.data?.item);
+        setData(result?.data);
+        console.log(result?.data);
       } else {
         notify?.error(result?.data?.message);
       }
@@ -51,12 +53,12 @@ const ItemPage = () => {
         <Link to="/" style={{ textDecoration: "none", color: PRIMARY_LIGHT_1 }}>
           Items
         </Link>
-        <Typography color="text.primary">{data?.title}</Typography>
+        <Typography color="text.primary">{data?.item?.title}</Typography>
       </Breadcrumbs>
 
-      <ItemDetails item={data} />
+      <ItemDetails item={data?.item} maxBid={data?.maxBid?.amount || "--"} />
 
-      <UserBid itemId={data?._id} />
+      <UserBid itemId={data?.item?._id} />
     </>
   );
 };

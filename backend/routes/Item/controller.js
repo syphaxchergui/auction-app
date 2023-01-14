@@ -3,6 +3,7 @@ import { createItem, findAllItems, findItemBySlug } from "./service.js";
 import cloudinary from "../../core/cloudinary.js";
 import { isValidObjectId } from "mongoose";
 import slug from "slug";
+import { findMaxBidByItem } from "../Bid/service.js";
 
 export const getAllItems = async (req, res, next) => {
   try {
@@ -31,10 +32,13 @@ export const getItemBySlug = async (req, res, next) => {
         404
       );
 
+    const maxBidArray = await findMaxBidByItem(item._id);
+    const maxBid = maxBidArray[0];
     return res.status(200).json({
       success: true,
       message: "Item by slug",
       item,
+      maxBid,
     });
   } catch (err) {
     next(err);

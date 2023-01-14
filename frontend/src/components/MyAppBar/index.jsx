@@ -18,7 +18,7 @@ import { useAuth } from "../../state/context/AuthContext";
 
 function CustomAppBar() {
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const { actions } = useAuth();
+  const { user, actions } = useAuth();
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -44,7 +44,16 @@ function CustomAppBar() {
         <Toolbar disableGutters>
           <h2 style={{ flexGrow: 1 }}>⚡BID</h2>
 
-          <Box sx={{ flexGrow: 0 }}>
+          <Box
+            sx={{
+              flexGrow: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <p>{user.fullname}</p>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" />
