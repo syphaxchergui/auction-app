@@ -39,14 +39,6 @@ export const AuthProvider = ({ children }) => {
       loading: true,
     });
     try {
-      // const data = {
-      //   user: {
-      //     userName: "user 1",
-      //     email: email,
-      //     role: "ADMIN",
-      //   },
-      //   token: "asdghjdsafkjkjfdhjhjflkjdsahj",
-      // };
       const result = await ApiMiddleware.post("/auth/login", {
         email,
         password,

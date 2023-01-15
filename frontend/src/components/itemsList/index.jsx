@@ -27,6 +27,10 @@ const ListToolBox = ({ isAdmin, slug }) => {
     navigate(`/items/${slug}`);
   };
 
+  const goToEdit = (slug) => {
+    navigate(`/edit-item`, { state: { slug } });
+  };
+
   const deleteItem = async (slug) => {
     try {
       setLoading(true);
@@ -57,7 +61,7 @@ const ListToolBox = ({ isAdmin, slug }) => {
         <Button
           variant="outlined"
           disableElevation
-          onClick={() => goToDetails(slug)}
+          onClick={() => goToEdit(slug)}
           startIcon={<Edit />}
         >
           Edit
@@ -89,7 +93,7 @@ const ItemsList = ({ items }) => {
             <TableCell>Image</TableCell>
             <TableCell>Item</TableCell>
             <TableCell>Min Bid&nbsp;($)</TableCell>
-            <TableCell>Date</TableCell>
+            <TableCell>Close Date</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>

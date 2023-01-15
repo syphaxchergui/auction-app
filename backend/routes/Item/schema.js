@@ -15,6 +15,10 @@ export const deleteItemSlugSchema = Joi.object({
   slug: Joi.string().required(),
 });
 
+export const searchItemsSchema = Joi.object({
+  q: Joi.string().required(),
+});
+
 export const getItemsSchema = Joi.object({
   page: Joi.number().required(),
   limit: Joi.number().required(),

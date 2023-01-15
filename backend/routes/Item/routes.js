@@ -6,6 +6,8 @@ import {
   getAllItems,
   getItemBySlug,
   removeItemBySlug,
+  updateItemBySlug,
+  searchItems,
 } from "./controller.js";
 import { ValidationSource, validate } from "../../utils/validate.js";
 import {
@@ -13,6 +15,7 @@ import {
   deleteItemSlugSchema,
   getItemSlugSchema,
   getItemsSchema,
+  searchItemsSchema,
 } from "./schema.js";
 
 const router = express.Router();
@@ -23,10 +26,25 @@ router.get(
   getAllItems,
   errorHandler
 );
+
+router.get(
+  "/search",
+  validate(searchItemsSchema, ValidationSource.QUERY),
+  searchItems,
+  errorHandler
+);
+
 router.get(
   "/:slug",
   validate(getItemSlugSchema, ValidationSource.PARAMS),
   getItemBySlug,
+  errorHandler
+);
+
+router.put(
+  "/:slug",
+  validate(getItemSlugSchema, ValidationSource.PARAMS),
+  updateItemBySlug,
   errorHandler
 );
 

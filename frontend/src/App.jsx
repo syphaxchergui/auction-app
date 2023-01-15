@@ -20,6 +20,9 @@ import NotificationProvider from "./state/context/NotificationContext";
 import { CssBaseline } from "@mui/material";
 import ItemPageAdmin from "./pages/itemPageAdmin";
 import NewItem from "./pages/newItem";
+import EditItem from "./pages/editItem";
+import Settings from "./pages/settings";
+import Search from "./pages/search";
 
 const primaryTheme = createTheme({
   palette: {
@@ -50,6 +53,8 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="/items/:slug" element={<ItemPageAdmin />} />
           <Route path="/new-item" element={<NewItem />} />
+          <Route path="/edit-item" element={<EditItem />} />
+          <Route path="/search" element={<Search />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
@@ -60,6 +65,8 @@ const App = () => {
       <Route exact path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="/items/:slug" element={<ItemPage />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/search" element={<Search />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

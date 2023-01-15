@@ -7,6 +7,11 @@ import { useNavigate } from "react-router-dom";
 import ApiMiddleware from "../../core/API";
 import { useAuth } from "../../state/context/AuthContext";
 import { useNotifications } from "../../state/context/NotificationContext";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 import "./styles.css";
 
@@ -25,11 +30,23 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 };
 
 const ItemDetailsAdmin = ({ item, maxBid }) => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const { actions: notify } = useNotifications();
 
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = React.useState(false);
+
+  const goToEdit = () => {
+    navigate(`/edit-item`, { state: { slug: item?.slug } });
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   const deleteItem = async (slug) => {
     try {
@@ -37,8 +54,8 @@ const ItemDetailsAdmin = ({ item, maxBid }) => {
       const result = await ApiMiddleware.delete(`/items/${slug}`);
       if (result.data.success) {
         notify.success(result?.data?.message);
-
-        setTimeout(() => navigate(-1), 1000);
+        handleClose();
+        navigate("/");
       } else {
         notify.error(result?.data?.message);
       }
@@ -105,6 +122,7 @@ const ItemDetailsAdmin = ({ item, maxBid }) => {
             fullWidth
             disableElevation
             variant="contained"
+            onClick={goToEdit}
             startIcon={<Edit />}
           >
             Edit
@@ -112,8 +130,7 @@ const ItemDetailsAdmin = ({ item, maxBid }) => {
           <LoadingButton
             fullWidth
             disableElevation
-            loading={loading}
-            onClick={() => deleteItem(item?.slug)}
+            onClick={handleClickOpen}
             variant="outlined"
             startIcon={<Delete />}
           >
@@ -121,6 +138,31 @@ const ItemDetailsAdmin = ({ item, maxBid }) => {
           </LoadingButton>
         </div>
       </Grid>
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Are you sure you want to delete the item ?"}
+        </DialogTitle>
+
+        <DialogActions>
+          <Button disableElevation onClick={handleClose} variant={"outlined"}>
+            No
+          </Button>
+          <LoadingButton
+            disableElevation
+            loading={loading}
+            onClick={() => deleteItem(item?.slug)}
+            variant={"contained"}
+            autoFocus
+          >
+            Yes, delete
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </Grid>
   );
 };

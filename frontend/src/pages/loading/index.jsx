@@ -10,15 +10,6 @@ const Loading = () => {
         <Grid item xs={12} md={12}>
           <Skeleton variant="rectangular" height={120} />
         </Grid>
-        {/* <Grid item xs={6} md={3}>
-          <Skeleton variant='rectangular' height={120} />
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Skeleton variant='rectangular' height={120} />
-        </Grid>
-        <Grid item xs={6} md={3}>
-          <Skeleton variant='rectangular' height={120} />
-        </Grid> */}
       </Grid>
 
       <Skeleton variant="text" width={300} sx={{ mt: 3 }} />

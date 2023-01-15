@@ -1,34 +1,65 @@
 import { Button, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { Image, Save } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
 import { useNotifications } from "../../state/context/NotificationContext";
 import ApiMiddleware from "../../core/API";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import Loading from "../../pages/loading";
 
-const ItemForm = () => {
+const ItemForm = ({ isEditing }) => {
   const [date, setDate] = useState(new Date());
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     minimumBid: 1,
   });
-
   const [formErrors, setFormErrors] = useState({
     title: "",
     description: "",
     minimumBid: "",
   });
-
   const [selectedFile, setSelectedFile] = useState(null);
-
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
+  const [data, setData] = useState(null);
+
   const { actions: notify } = useNotifications();
   const navigate = useNavigate();
+
+  const { state } = useLocation();
+
+  useEffect(() => {
+    if (isEditing) getData();
+  }, []);
+
+  const getData = async () => {
+    try {
+      const { slug } = state;
+      setLoadingData(true);
+      const result = await ApiMiddleware.get(`/items/${slug}`);
+      if (result.data?.success) {
+        setData(result?.data);
+        setFormData({
+          title: result?.data?.item?.title,
+          description: result?.data?.item?.description,
+          minimumBid: result?.data?.item?.minBid,
+        });
+        setDate(new Date(result?.data?.item?.expirationDate));
+        //console.log(result?.data);
+      } else {
+        notify?.error(result?.data?.message);
+      }
+      setLoadingData(false);
+    } catch (err) {
+      notify?.error(err?.response?.data?.message || err.message);
+      setLoadingData(false);
+    }
+  };
 
   const handleChangeDate = (newValue) => {
     setDate(newValue);
@@ -93,6 +124,44 @@ const ItemForm = () => {
     }
   };
 
+  const updateItem = async () => {
+    const { hasErrors, errors } = validateForm(formData);
+    if (hasErrors) {
+      setFormErrors(errors);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      let updates = {};
+
+      if (data?.item["title"] !== formData["title"]) {
+        updates.title = formData["title"];
+      }
+      if (data?.item["description"] !== formData["description"]) {
+        updates.description = formData["description"];
+      }
+      if (data?.item["minBid"] !== formData["minimumBid"]) {
+        updates.minBid = formData["minimumBid"];
+      }
+      if (new Date(data?.item["expirationDate"]) !== date) {
+        updates.expirationDate = date;
+      }
+
+      const result = await ApiMiddleware.put(`/items/${state.slug}`, updates);
+      if (result.data?.success) {
+        notify.success(result.data?.message);
+        navigate("/");
+      } else {
+        notify.error(result.data?.message);
+      }
+    } catch (error) {
+      notify.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  if (isEditing && loadingData) return <Loading />;
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box component={"form"} sx={{ display: "flex", flexDirection: "column" }}>
@@ -133,37 +202,55 @@ const ItemForm = () => {
           onChange={handleChangeDate}
           renderInput={(params) => <TextField margin="normal" {...params} />}
         />
-        <Button
-          disableElevation
-          component="label"
-          variant="outlined"
-          fullWidth
-          sx={{ mt: 1 }}
-          size="large"
-          startIcon={<Image />}
-        >
-          Upload image {selectedFile?.name}
-          <input
-            type="file"
-            defaultValue={selectedFile}
-            onChange={(e) => setSelectedFile(e.target.files[0])}
-            hidden
-            accept="image/*"
-          />
-        </Button>
-        <LoadingButton
-          disableElevation
-          type="submit"
-          variant="contained"
-          fullWidth
-          loading={loading}
-          onClick={submitItem}
-          sx={{ my: 4 }}
-          size="large"
-          startIcon={<Save />}
-        >
-          Add Item
-        </LoadingButton>
+        {isEditing ? (
+          <LoadingButton
+            disableElevation
+            type="submit"
+            variant="contained"
+            fullWidth
+            loading={loading}
+            onClick={updateItem}
+            sx={{ my: 4 }}
+            size="large"
+            startIcon={<Save />}
+          >
+            Save changes
+          </LoadingButton>
+        ) : (
+          <>
+            <Button
+              disableElevation
+              component="label"
+              variant="outlined"
+              fullWidth
+              sx={{ mt: 1 }}
+              size="large"
+              startIcon={<Image />}
+            >
+              Upload image {selectedFile?.name}
+              <input
+                type="file"
+                defaultValue={selectedFile}
+                onChange={(e) => setSelectedFile(e.target.files[0])}
+                hidden
+                accept="image/*"
+              />
+            </Button>
+            <LoadingButton
+              disableElevation
+              type="submit"
+              variant="contained"
+              fullWidth
+              loading={loading}
+              onClick={submitItem}
+              sx={{ my: 4 }}
+              size="large"
+              startIcon={<Save />}
+            >
+              Add Item
+            </LoadingButton>
+          </>
+        )}
       </Box>
     </LocalizationProvider>
   );

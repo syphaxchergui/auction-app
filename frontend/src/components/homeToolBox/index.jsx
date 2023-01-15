@@ -1,20 +1,37 @@
 import { Add, GridView, Search, ViewList } from "@mui/icons-material";
 import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { createSearchParams, useNavigate } from "react-router-dom";
 import { useUser } from "../../state/context/UserContext";
 import "./styles.css";
 const HomeToolBox = ({ isAdmin }) => {
   const { viewType, actions } = useUser();
   const navigate = useNavigate();
 
+  const [search, setSearch] = useState("");
+
   const goToNewItem = () => {
-    navigate("/new-item");
+    navigate("/new-item", { replace: true });
   };
+
+  const goToSearchScreen = () => {
+    navigate(`/search?query=${search}`, { replace: true });
+  };
+
   return (
     <div className="htb-container">
       <div style={{ marginBottom: 12 }}>
-        <TextField id="search-iput" size="small" placeholder="Search..." />
-        <IconButton sx={{ ml: 1 }}>
+        <TextField
+          id="search-iput"
+          size="small"
+          placeholder="Search..."
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}
+          value={search}
+          type="search"
+        />
+        <IconButton onClick={goToSearchScreen} sx={{ ml: 1 }}>
           <Search color="primary" />
         </IconButton>
       </div>

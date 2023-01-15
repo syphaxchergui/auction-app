@@ -4,23 +4,27 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
-import AdbIcon from "@mui/icons-material/Adb";
 import { ListItemIcon, ListItemText } from "@mui/material";
-import { Person3 } from "@mui/icons-material";
+import { Settings } from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../state/context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { PRIMARY, PRIMARY_LIGHT_1 } from "../../constant/colors";
+import { isAdmin } from "../../utils/security";
 
 function CustomAppBar() {
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { user, actions } = useAuth();
+  const navigate = useNavigate();
+
+  const goToSettings = () => {
+    navigate("/settings", { replace: true });
+    handleCloseUserMenu();
+  };
 
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
@@ -86,12 +90,14 @@ function CustomAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              <MenuItem onClick={handleCloseUserMenu}>
-                <ListItemIcon>
-                  <Person3 fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>My Profile</ListItemText>
-              </MenuItem>
+              {isAdmin(user?.role) ? null : (
+                <MenuItem onClick={goToSettings}>
+                  <ListItemIcon>
+                    <Settings fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText>Settings</ListItemText>
+                </MenuItem>
+              )}
               <MenuItem onClick={actions?.logout}>
                 <ListItemIcon>
                   <LogoutIcon fontSize="small" />

@@ -17,7 +17,7 @@ export const findAllItemsWithPagination = async (currentPage, perPage) => {
       .limit(perPage)
       .skip(perPage * page)
       .sort({
-        createdAt: "asc",
+        createdAt: "desc",
       })
       .exec();
 
@@ -46,6 +46,17 @@ export const findItemById = async (id) => {
 export const findItemBySlug = async (slug) => {
   try {
     const item = Item.findOne({ slug: slug }, "-__v -createdAt -updatedAt");
+    return item;
+  } catch (err) {
+    throw new ErrorResponse("Server Error", 500);
+  }
+};
+
+export const updateItem = async (id, updates) => {
+  try {
+    const item = Item.findOneAndUpdate({ _id: id }, updates, {
+      new: true,
+    });
     return item;
   } catch (err) {
     throw new ErrorResponse("Server Error", 500);
@@ -81,5 +92,19 @@ export const deleteItemBySlug = async (slug) => {
     return item;
   } catch (err) {
     throw new ErrorResponse("An error ocurred when deleting the item", 500);
+  }
+};
+
+export const findItemsBySearch = async (q) => {
+  try {
+    const items = Item.find({
+      $or: [
+        { title: { $regex: q, $options: "i" } },
+        { description: { $regex: q, $options: "i" } },
+      ],
+    });
+    return items;
+  } catch (err) {
+    throw new ErrorResponse("An error ocurred when fetching the items", 500);
   }
 };

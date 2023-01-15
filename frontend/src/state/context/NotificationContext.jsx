@@ -1,30 +1,3 @@
-// import React, { useEffect, useState, useCallback } from "react";
-// import toast, { Toaster } from "react-hot-toast";
-
-// const NotificationContext = React.createContext();
-
-// export default function NotificationProvider({ children }) {
-//   const success = (body) => toast.success(body);
-//   const error = (body) => toast.error(body);
-//   const info = (body) => toast.success(body);
-
-//   return (
-//     <NotificationContext.Provider
-//       value={{
-//         actions: {
-//           error,
-//           success,
-//           info,
-//         },
-//       }}
-//     >
-//       {children}
-//     </NotificationContext.Provider>
-//   );
-// }
-
-// export const useNotifications = () => React.useContext(NotificationContext);
-
 import React, { useEffect, useState, useCallback } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import IconButton from "@mui/material/IconButton";
