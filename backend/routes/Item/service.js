@@ -10,6 +10,30 @@ export const findAllItems = async () => {
   }
 };
 
+export const findAllItemsWithPagination = async (currentPage, perPage) => {
+  try {
+    var page = Math.max(0, currentPage);
+    const items = await Item.find()
+      .limit(perPage)
+      .skip(perPage * page)
+      .sort({
+        createdAt: "asc",
+      })
+      .exec();
+
+    const count = await Item.count().exec();
+
+    //console.log(items);
+    return {
+      items,
+      page: page,
+      pages: count / perPage,
+    };
+  } catch (err) {
+    throw new ErrorResponse("Server Error", 500);
+  }
+};
+
 export const findItemById = async (id) => {
   try {
     const item = Item.findById(id, "-__v -createdAt -updatedAt");
@@ -51,9 +75,9 @@ export const createItem = async (
   }
 };
 
-export const deleteItem = async (id) => {
+export const deleteItemBySlug = async (slug) => {
   try {
-    const item = Item.deleteOne({ _id: id });
+    const item = Item.deleteOne({ slug });
     return item;
   } catch (err) {
     throw new ErrorResponse("An error ocurred when deleting the item", 500);

@@ -6,7 +6,7 @@ const Layout = () => {
   return (
     <>
       <CustomAppBar />
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Outlet />
       </Container>
     </>

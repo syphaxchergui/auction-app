@@ -42,7 +42,7 @@ function CustomAppBar() {
         mb: 4,
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Link
             style={{

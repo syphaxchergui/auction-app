@@ -4,18 +4,11 @@ import Item from "../item";
 
 const ItemsGrid = ({ items }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      {items.length > 0 ? (
+    <Box>
+      {items?.length > 0 ? (
         <Grid container spacing={2}>
           {items?.map((item) => (
-            <Grid key={item?._id} item xs={12} sm={6} md={3}>
+            <Grid key={item?._id} item xs={12} sm={6} md={3} lg={12 / 5}>
               <Item
                 id={item?._id}
                 slug={item?.slug}
@@ -27,13 +20,6 @@ const ItemsGrid = ({ items }) => {
           ))}
         </Grid>
       ) : null}
-      <Pagination
-        sx={{ my: 6 }}
-        count={10}
-        variant="outlined"
-        color="primary"
-        size="large"
-      />
     </Box>
   );
 };

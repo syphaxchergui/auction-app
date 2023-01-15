@@ -27,6 +27,27 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 const ItemDetailsAdmin = ({ item, maxBid }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { actions: notify } = useNotifications();
+
+  const [loading, setLoading] = useState(false);
+
+  const deleteItem = async (slug) => {
+    try {
+      setLoading(true);
+      const result = await ApiMiddleware.delete(`/items/${slug}`);
+      if (result.data.success) {
+        notify.success(result?.data?.message);
+
+        setTimeout(() => navigate(-1), 1000);
+      } else {
+        notify.error(result?.data?.message);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      notify.error(error?.response?.data?.message || error.message);
+    }
+  };
 
   return (
     <Grid container columnSpacing={5}>
@@ -88,14 +109,16 @@ const ItemDetailsAdmin = ({ item, maxBid }) => {
           >
             Edit
           </Button>
-          <Button
+          <LoadingButton
             fullWidth
             disableElevation
+            loading={loading}
+            onClick={() => deleteItem(item?.slug)}
             variant="outlined"
             startIcon={<Delete />}
           >
             Delete
-          </Button>
+          </LoadingButton>
         </div>
       </Grid>
     </Grid>

@@ -12,13 +12,37 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../state/context/AuthContext";
 import { isAdmin } from "../../utils/security";
 import { Delete, Edit } from "@mui/icons-material";
+import ApiMiddleware from "../../core/API";
+import { useState } from "react";
+import { useNotifications } from "../../state/context/NotificationContext";
+import { LoadingButton } from "@mui/lab";
 
 const ListToolBox = ({ isAdmin, slug }) => {
   let detailsText = isAdmin ? "Details" : "Bid Now";
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const { actions: notify } = useNotifications();
 
   const goToDetails = (slug) => {
     navigate(`/items/${slug}`);
+  };
+
+  const deleteItem = async (slug) => {
+    try {
+      setLoading(true);
+      const result = await ApiMiddleware.delete(`/items/${slug}`);
+      if (result.data.success) {
+        notify.success(result?.data?.message);
+
+        setTimeout(() => navigate(0), 1000);
+      } else {
+        notify.error(result?.data?.message);
+      }
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      notify.error(error?.response?.data?.message || error.message);
+    }
   };
   return (
     <div style={{ display: "flex", gap: 10 }}>
@@ -40,14 +64,15 @@ const ListToolBox = ({ isAdmin, slug }) => {
         </Button>
       ) : null}
       {isAdmin ? (
-        <Button
+        <LoadingButton
           disableElevation
+          loading={loading}
           variant="outlined"
-          onClick={() => goToDetails(slug)}
+          onClick={() => deleteItem(slug)}
           startIcon={<Delete />}
         >
           Delete
-        </Button>
+        </LoadingButton>
       ) : null}
     </div>
   );

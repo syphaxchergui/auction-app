@@ -1,3 +1,4 @@
+import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
 import HomeToolBox from "../../components/homeToolBox";
 import ItemsGrid from "../../components/itemsGrid";
@@ -13,21 +14,24 @@ import "./styles.css";
 const Home = () => {
   const { user } = useAuth();
   const { actions: notify } = useNotifications();
-  const { viewType } = useUser();
+  const { viewType, pagination, actions } = useUser();
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [pagination]);
 
   const getData = async () => {
     try {
       setLoading(true);
-      const result = await ApiMiddleware.get("/items");
+      const result = await ApiMiddleware.get(
+        `/items?page=${pagination.currentPage}&limit=${pagination.limit}`
+      );
       if (result.data?.success) {
-        setData(result?.data?.items);
+        setData(result?.data);
+        console.log(result.data);
       } else {
         notify?.error(result?.data?.message);
       }
@@ -41,17 +45,35 @@ const Home = () => {
   if (loading) return <Loading />;
 
   return (
-    <div>
+    <>
       <HomeToolBox isAdmin={isAdmin(user.role)} />
 
-      {isAdmin(user.role) ? (
-        <ItemsList items={data} />
-      ) : viewType === "LIST" ? (
-        <ItemsList items={data} />
-      ) : (
-        <ItemsGrid items={data} />
-      )}
-    </div>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
+        {isAdmin(user.role) ? (
+          <ItemsList items={data?.items} />
+        ) : viewType === "LIST" ? (
+          <ItemsList items={data?.items} />
+        ) : (
+          <ItemsGrid items={data?.items} />
+        )}
+        <Pagination
+          sx={{ my: 6, alignSelf: "center" }}
+          count={Math.ceil(data?.pages)}
+          onChange={(e, page) => {
+            actions.setPage(page - 1);
+          }}
+          page={pagination.currentPage + 1}
+          variant="outlined"
+          color="primary"
+          size="large"
+        />
+      </div>
+    </>
   );
 };
 

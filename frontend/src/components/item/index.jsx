@@ -21,11 +21,7 @@ const Item = ({ id, slug, title, minBid, image }) => {
             textOverflow: "ellipsis",
           }}
         >
-          <h4>
-            {title}
-            {title}
-            {title}
-          </h4>
+          <h4>{title}</h4>
           <p>Min bid: ${minBid}</p>
         </div>
         {/* <h1 style={{ color: PRIMARY_LIGHT_1, margin: 0 }}>${minBid}</h1> */}

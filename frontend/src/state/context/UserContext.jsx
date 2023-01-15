@@ -5,7 +5,7 @@ const VIEW_TYPES = ["GRID", "LIST"];
 
 const initialState = {
   pagination: {
-    currentPage: 1,
+    currentPage: 0,
     limit: 10,
     total: 0,
   },
@@ -22,35 +22,6 @@ const UserContext = React.createContext(initialState);
 export const UserProvider = ({ children }) => {
   const [state, setState] = useState(initialState);
 
-  const { loggedin } = useAuth();
-
-  //   const getUsers = async ({ page, limit }, filters) => {
-  //     setState({ ...state, loading: true });
-  //     try {
-  //       const { data: User, count } = await UserServiceInstance.fetchUsers(
-  //         {
-  //           page,
-  //           limit,
-  //         },
-  //         filters,
-  //       );
-  //       setState({
-  //         ...state,
-  //         selectedCount: 0,
-  //         User: User.map((app) => ({ data: app, selected: false })),
-  //         pagination: {
-  //           ...state.pagination,
-  //           total: count,
-  //         },
-  //         loading: false,
-  //         lastUpdated: new Date(),
-  //         error: null,
-  //       });
-  //     } catch (err) {
-  //       setState({ ...state, loading: false, error: err.message });
-  //     }
-  //   };
-
   const setPage = (newPage) => {
     setState({
       ...state,
@@ -61,18 +32,6 @@ export const UserProvider = ({ children }) => {
   const nextPage = () => setPage(state.pagination.currentPage + 1);
 
   const previousPage = () => setPage(state.pagination.currentPage - 1);
-
-  //   useEffect(() => {
-  //     if (loggedin) getUsers({ page: 1, limit: state.pagination.limit }, filters);
-  //   }, [loggedin]);
-
-  //pagination
-  //   useEffect(() => {
-  //     if (!state.loading)
-  //       getUsers({ page: state.pagination.currentPage, limit: state.pagination.limit }, filters);
-  //   }, [state.pagination.currentPage, state.pagination.limit]);
-
-  //token upadte
 
   const setLoading = async (loadingStatus) => {
     setState({ ...state, loading: loadingStatus });
