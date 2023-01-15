@@ -1,11 +1,4 @@
-import {
-  Avatar,
-  Button,
-  Grid,
-  IconButton,
-  Pagination,
-  TextField,
-} from "@mui/material";
+import { Avatar, Button } from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,7 +6,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { createSearchParams, useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../state/context/AuthContext";
 import { isAdmin } from "../../utils/security";
 import { Delete, Edit, KeyboardReturn, SearchSharp } from "@mui/icons-material";
