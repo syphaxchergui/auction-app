@@ -1,16 +1,19 @@
-import { Button } from "@mui/material";
 import { useEffect, useState } from "react";
 import HomeToolBox from "../../components/homeToolBox";
 import ItemsGrid from "../../components/itemsGrid";
+import ItemsList from "../../components/itemsList";
 import ApiMiddleware from "../../core/API";
 import { useAuth } from "../../state/context/AuthContext";
 import { useNotifications } from "../../state/context/NotificationContext";
+import { useUser } from "../../state/context/UserContext";
+import { isAdmin } from "../../utils/security";
 import Loading from "../loading";
 import "./styles.css";
 
 const Home = () => {
-  const { actions } = useAuth();
+  const { user } = useAuth();
   const { actions: notify } = useNotifications();
+  const { viewType } = useUser();
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
@@ -39,8 +42,15 @@ const Home = () => {
 
   return (
     <div>
-      <HomeToolBox />
-      <ItemsGrid items={data} />
+      <HomeToolBox isAdmin={isAdmin(user.role)} />
+
+      {isAdmin(user.role) ? (
+        <ItemsList items={data} />
+      ) : viewType === "LIST" ? (
+        <ItemsList items={data} />
+      ) : (
+        <ItemsGrid items={data} />
+      )}
     </div>
   );
 };

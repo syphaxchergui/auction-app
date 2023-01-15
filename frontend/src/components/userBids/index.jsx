@@ -13,18 +13,7 @@ import ApiMiddleware from "../../core/API";
 import { useNotifications } from "../../state/context/NotificationContext";
 import { useAuth } from "../../state/context/AuthContext";
 
-function createData(id, amount, date) {
-  return { id, amount, date };
-}
-
-const rows = [
-  createData(1233, 29, new Date().toLocaleString()),
-  createData(1453, 14, new Date().toLocaleString()),
-  createData(4333, 12, new Date().toLocaleString()),
-  createData(1333, 10, new Date().toLocaleString()),
-];
-
-const UserBid = ({ itemId }) => {
+const UserBid = ({ itemId, isAdmin }) => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
   const { actions: notify } = useNotifications();
@@ -37,7 +26,9 @@ const UserBid = ({ itemId }) => {
   const getDate = async () => {
     try {
       setLoading(true);
-      const result = await ApiMiddleware.get(`/bids/${user?.id}/${itemId}`);
+
+      let url = isAdmin ? `/bids/${itemId}` : `/bids/${user?.id}/${itemId}`;
+      const result = await ApiMiddleware.get(url);
       if (result.data?.success) {
         setData(result?.data?.bids);
       } else {
@@ -55,11 +46,12 @@ const UserBid = ({ itemId }) => {
   if (data.length < 1) return null;
   return (
     <Box sx={{ mt: 4 }}>
-      <h1>Your Bids</h1>
+      {isAdmin ? <h1>Item Bids</h1> : <h1>Your Bids</h1>}
       <TableContainer sx={{ my: 4 }} component={Paper}>
         <Table aria-label="simple table">
           <TableHead>
             <TableRow>
+              {isAdmin ? <TableCell>User</TableCell> : null}
               <TableCell>Amount&nbsp;($)</TableCell>
               <TableCell>Date</TableCell>
             </TableRow>
@@ -67,9 +59,10 @@ const UserBid = ({ itemId }) => {
           <TableBody>
             {data?.map((row) => (
               <TableRow
-                key={row.name}
+                key={row._id}
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
+                {isAdmin ? <TableCell>{row.userId}</TableCell> : null}
                 <TableCell>{row.amount}</TableCell>
                 <TableCell>
                   {new Date(row?.createdAt).toLocaleString()}

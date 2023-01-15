@@ -12,6 +12,17 @@ export const findBidUserProduct = async (userId, itemId) => {
   }
 };
 
+export const findBidProduct = async (itemId) => {
+  try {
+    const bids = Bid.find({ itemId }, "-__v  -updatedAt").sort({
+      createdAt: -1,
+    });
+    return bids;
+  } catch (err) {
+    throw new ErrorResponse("Server Error", 500);
+  }
+};
+
 export const createBid = async (userId, itemId, amount) => {
   try {
     const bid = Bid.create({

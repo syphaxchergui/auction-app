@@ -1,4 +1,4 @@
-.item-d-img {
+.item-da-img {
   width: 100%;
   object-fit: contain;
   object-position: center;
@@ -11,7 +11,7 @@
   background-color: #fce6e6;
 }
 
-.item-d-subtitle-time {
+.item-da-subtitle-time {
   color: rgb(92, 92, 92);
   font-size: 14px;
   text-align: center;
@@ -19,32 +19,32 @@
   margin-bottom: 0.5em;
 }
 
-.item-d-title {
+.item-da-title {
   margin-top: 0.5em;
 }
-.item-d-bid {
+.item-da-bid {
   font-size: 64px;
   font-weight: normal;
   margin-bottom: 20px;
 }
 
-.item-d-bid-dollar {
+.item-da-bid-dollar {
   font-size: 34px;
 }
 
-.item-d-subtitle {
+.item-da-subtitle {
   color: rgb(92, 92, 92);
   font-size: 14px;
   margin-top: 1em;
 }
 
-.item-d-description {
+.item-da-description {
   max-height: 100px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
 
-.item-d-time-container {
+.item-da-time-container {
   padding: 0.5em;
   border: 1px solid #f0f0f0;
   margin-bottom: 1em;
@@ -57,12 +57,12 @@
   justify-content: center;
 }
 
-.item-d-time {
+.item-da-time {
   text-align: center;
   margin-bottom: 0.5rem;
 }
 
-.item-d-time-finish {
+.item-da-time-finish {
   text-align: center;
   margin-top: 12px;
   background-color: #fff;
@@ -70,8 +70,10 @@
   border-radius: 10px;
 }
 
-.item-d-bottom-section {
+.item-da-bottom-section {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+
+  gap: 10px;
 }

@@ -1,6 +1,7 @@
 .htb-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   padding-left: 1em;
+  flex-wrap: wrap;
 }

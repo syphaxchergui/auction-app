@@ -9,7 +9,7 @@ const ApiMiddleware = axios.create(axiosConfig);
 
 // ApiMiddleware.interceptors.request.use(
 //   function (config) {
-//     const { token } = JSON.parse(localStorage.getItem('cla_admin_token') ?? '{}');
+//     const { token } = JSON.parse(localStorage.getItem('_token') ?? '{}');
 //     if (!token) return config;
 //     return { ...config, headers: { Authorization: `Bearer ${token}` } };
 //   },

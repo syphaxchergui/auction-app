@@ -78,9 +78,9 @@ export const UserProvider = ({ children }) => {
     setState({ ...state, loading: loadingStatus });
   };
 
-  const setViewStyle = (type) => {
-    setState({ ...state, viewType: "LIST" });
-  };
+  function setViewType(type) {
+    setState({ ...state, viewType: type });
+  }
   return (
     <UserContext.Provider
       value={{
@@ -90,7 +90,7 @@ export const UserProvider = ({ children }) => {
           nextPage,
           previousPage,
           setLoading,
-          setViewStyle,
+          setViewType,
         },
       }}
     >

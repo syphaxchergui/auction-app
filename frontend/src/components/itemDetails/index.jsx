@@ -1,18 +1,19 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, Grid, TextField } from "@mui/material";
+import { Button, FormControlLabel, Grid, TextField } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Countdown from "react-countdown";
 import { useNavigate } from "react-router-dom";
 import ApiMiddleware from "../../core/API";
 import { useAuth } from "../../state/context/AuthContext";
 import { useNotifications } from "../../state/context/NotificationContext";
+import Checkbox from "@mui/material/Checkbox";
 
 import "./styles.css";
 
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
   if (completed) {
     // Render a completed state
-    return <span>Bid finished</span>;
+    return <span>Bid Closed</span>;
   } else {
     // Render a countdown
     return (
@@ -40,6 +41,18 @@ const ItemDetails = ({ item, maxBid }) => {
     let hasErrors = false;
     if (formData.amount.length === 0) {
       errors["amount"] = "Amount is required";
+      hasErrors = true;
+    } else if (isNaN(formData.amount)) {
+      errors["amount"] = "Amount must be a valide number";
+      hasErrors = true;
+    } else if (maxBid.amount !== "--" && formData.amount < item?.minBid) {
+      errors["amount"] = `Amount must be > minimum Bid ${item?.minBid}`;
+      hasErrors = true;
+    } else if (maxBid.amount === "--" && formData.amount < item?.minBid) {
+      errors["amount"] = `Amount must be > minimum Bid ${item?.minBid}`;
+      hasErrors = true;
+    } else if (maxBid.amount > 0 && formData.amount <= maxBid?.amount) {
+      errors["amount"] = `Amount must be > Highest Bid ${maxBid?.amount}`;
       hasErrors = true;
     }
 
@@ -100,7 +113,7 @@ const ItemDetails = ({ item, maxBid }) => {
               />
             </h1>
             <p className="item-d-time-finish">
-              Finish date {new Date(item?.expirationDate).toLocaleString()}
+              Close date {new Date(item?.expirationDate).toLocaleString()}
             </p>
           </div>
           <h1 className="item-d-title">{item?.title}</h1>
@@ -109,41 +122,43 @@ const ItemDetails = ({ item, maxBid }) => {
 
           <Grid container>
             <Grid item xs={6}>
-              <p className="item-d-subtitle">Highest bid</p>
+              <p className="item-d-subtitle">
+                Highest bid {maxBid?.userId === user?.id ? "(Your Bid)" : null}
+              </p>
               <h1 className="item-d-bid">
                 <span className="item-d-bid-dollar">$ </span>
-                {maxBid}
+                {maxBid?.amount}
               </h1>
             </Grid>
-            {/* <Grid item xs={6}>
-              {" "}
-              <p className="item-d-subtitle">Your last bid</p>
-              <h1 className="item-d-bid">
-                <span className="item-d-bid-dollar">$ </span>-
-              </h1>
-            </Grid> */}
+            <Grid item xs={6}>
+              <p className="item-d-subtitle">Options</p>
+
+              <FormControlLabel control={<Checkbox />} label="Auto-bidding" />
+            </Grid>
           </Grid>
         </div>
-        <div className="item-d-bottom-section">
-          <TextField
-            fullWidth
-            helperText={formErrors.amount}
-            error={formErrors.amount !== ""}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            size="midium"
-            placeholder={`Min bid: $${item?.minBid}`}
-          />
-          <LoadingButton
-            loading={loading}
-            disableElevation
-            sx={{ width: 200, ml: 2, height: 56 }}
-            variant="contained"
-            onClick={submitBid}
-          >
-            Place Bid
-          </LoadingButton>
-        </div>
+        {new Date() > new Date(item?.expirationDate) ? null : (
+          <div className="item-d-bottom-section">
+            <TextField
+              fullWidth
+              helperText={formErrors.amount}
+              error={formErrors.amount !== ""}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              size="midium"
+              placeholder={`Min bid: $${item?.minBid}`}
+            />
+            <LoadingButton
+              loading={loading}
+              disableElevation
+              sx={{ width: 200, ml: 2, height: 56 }}
+              variant="contained"
+              onClick={submitBid}
+            >
+              Place Bid
+            </LoadingButton>
+          </div>
+        )}
       </Grid>
     </Grid>
   );

@@ -15,7 +15,7 @@ const ItemsGrid = ({ items }) => {
       {items.length > 0 ? (
         <Grid container spacing={2}>
           {items?.map((item) => (
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid key={item?._id} item xs={12} sm={6} md={3}>
               <Item
                 id={item?._id}
                 slug={item?.slug}

@@ -17,14 +17,14 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { PRIMARY } from "./constant/colors";
 import { UserProvider } from "./state/context/UserContext";
 import NotificationProvider from "./state/context/NotificationContext";
+import { CssBaseline } from "@mui/material";
+import ItemPageAdmin from "./pages/itemPageAdmin";
+import NewItem from "./pages/newItem";
 
 const primaryTheme = createTheme({
   palette: {
     primary: {
       main: PRIMARY,
-    },
-    secondary: {
-      main: "#000",
     },
   },
 });
@@ -48,7 +48,8 @@ const App = () => {
       <Routes>
         <Route exact path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="/items/:slug" element={<ItemPage />} />
+          <Route path="/items/:slug" element={<ItemPageAdmin />} />
+          <Route path="/new-item" element={<NewItem />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
@@ -66,15 +67,16 @@ const App = () => {
 };
 
 export default () => (
-  <BrowserRouter>
-    <ThemeProvider theme={primaryTheme}>
+  <ThemeProvider theme={primaryTheme}>
+    <BrowserRouter>
       <NotificationProvider>
         <AuthProvider>
           <UserProvider>
+            <CssBaseline />
             <App />
           </UserProvider>
         </AuthProvider>
       </NotificationProvider>
-    </ThemeProvider>
-  </BrowserRouter>
+    </BrowserRouter>
+  </ThemeProvider>
 );

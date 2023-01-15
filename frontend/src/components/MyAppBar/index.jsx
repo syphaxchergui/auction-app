@@ -15,6 +15,8 @@ import { ListItemIcon, ListItemText } from "@mui/material";
 import { Person3 } from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../state/context/AuthContext";
+import { Link } from "react-router-dom";
+import { PRIMARY, PRIMARY_LIGHT_1 } from "../../constant/colors";
 
 function CustomAppBar() {
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -30,9 +32,9 @@ function CustomAppBar() {
 
   return (
     <AppBar
-      elevation={0}
       position="static"
       color="transparent"
+      elevation={0}
       sx={{
         borderBottomWidth: 2,
         borderStyle: "solid",
@@ -42,7 +44,16 @@ function CustomAppBar() {
     >
       <Container maxWidth="lg">
         <Toolbar disableGutters>
-          <h2 style={{ flexGrow: 1 }}>⚡BID</h2>
+          <Link
+            style={{
+              flexGrow: 1,
+              textDecoration: "none",
+              color: PRIMARY,
+            }}
+            to="/"
+          >
+            <h2>⚡BID</h2>
+          </Link>
 
           <Box
             sx={{

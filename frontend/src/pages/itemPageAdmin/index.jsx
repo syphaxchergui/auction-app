@@ -12,8 +12,9 @@ import {
   PRIMARY_LIGHT_2,
   PRIMARY_LIGHT_3,
 } from "../../constant/colors";
+import ItemDetailsAdmin from "../../components/itemDetailsAdmin";
 
-const ItemPage = () => {
+const ItemPageAdmin = () => {
   const params = useParams();
   const { actions: notify } = useNotifications();
 
@@ -55,14 +56,14 @@ const ItemPage = () => {
         <Typography color="text.primary">{data?.item?.title}</Typography>
       </Breadcrumbs>
 
-      <ItemDetails
+      <ItemDetailsAdmin
         item={data?.item}
         maxBid={data?.maxBid || { amount: "--" }}
       />
 
-      <UserBid itemId={data?.item?._id} isAdmin={false} />
+      <UserBid itemId={data?.item?._id} isAdmin={true} />
     </>
   );
 };
 
-export default ItemPage;
+export default ItemPageAdmin;
