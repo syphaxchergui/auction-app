@@ -77,8 +77,6 @@ export const autobidding = async (req, res, next) => {
     //update the user params reservedAmout = reservedAmount - highestBid + 1
     //if(alertBid) send notification to the user
 
-    //We get the highest bid
-    console.log(autobids);
 
     let autobid;
 
