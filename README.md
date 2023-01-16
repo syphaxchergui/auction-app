@@ -6,7 +6,10 @@ A web auction application for an antique items seller. The application will allo
 
 ## Tools Used
 
-The frontend application was build using `ReactJs` while the backend application was built with the `NodeJs` and `ExpressJs` with data being served from `MongoDB` database.
+- Frontend **`ReactJs`** ;
+- Backend **`NodeJs`** and **`ExpressJs`** ;
+- Database **`MongoDB`** ;
+- Image are uploaded using **`Cloudinary`**.
 
 ## Backend
 
