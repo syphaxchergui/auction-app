@@ -22,8 +22,9 @@ const HomeToolBox = ({ isAdmin }) => {
     <div className="htb-container">
       <div style={{ marginBottom: 12 }}>
         <TextField
-          id="search-iput"
+          id="search-input"
           size="small"
+          sx={{ width: 230 }}
           placeholder="Search..."
           onChange={(e) => {
             setSearch(e.target.value);

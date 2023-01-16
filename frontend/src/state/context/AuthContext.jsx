@@ -2,6 +2,7 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ApiMiddleware from "../../core/API";
 import useToken from "../../hooks/useToken";
+import { send } from "../../utils/Push";
 import { useNotifications } from "./NotificationContext";
 
 const initialState = {
@@ -54,6 +55,7 @@ export const AuthProvider = ({ children }) => {
           loggedin: true,
           error: "",
         });
+        if (result.data.user?.role === "USER") send(result.data?.user?.id);
       } else {
         notify?.error(result.data.message);
         setState({
@@ -81,12 +83,19 @@ export const AuthProvider = ({ children }) => {
       loading: true,
     });
     try {
-      const data = {
-        user: null,
-        token: null,
-      };
-      navigate("/");
-      setState({ ...state, ...data, loading: false, loggedin: false });
+      const result = await ApiMiddleware.post("/auth/logout", {
+        userId: state.user?.id,
+      });
+
+      if (result.data.success) {
+        const data = {
+          user: null,
+          token: null,
+        };
+        navigate("/");
+        setState({ ...state, ...data, loading: false, loggedin: false });
+        notify.success(result.data?.message);
+      }
     } catch (err) {
       setState({ ...state, loading: false, error: err.message });
     }

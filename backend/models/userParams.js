@@ -19,6 +19,9 @@ const userParamsSchema = mongoose.Schema(
       required: true,
       default: 0,
     },
+    subscription: {
+      type: mongoose.Schema.Types.String,
+    },
   },
   {
     timestamps: true,

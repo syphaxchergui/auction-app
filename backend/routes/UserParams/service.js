@@ -16,6 +16,7 @@ export const createUserParams = async (userId, maxBidAmount, alertBid) => {
       userId,
       maxBidAmount,
       alertBid,
+      subscription: "",
     });
     return userParams;
   } catch (err) {

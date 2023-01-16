@@ -15,7 +15,7 @@ import Layout from "./layout";
 import { AuthProvider, useAuth } from "./state/context/AuthContext.jsx";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { PRIMARY } from "./constant/colors";
-import { UserProvider } from "./state/context/UserContext";
+import { UserProvider, useUser } from "./state/context/UserContext";
 import NotificationProvider from "./state/context/NotificationContext";
 import { CssBaseline } from "@mui/material";
 import ItemPageAdmin from "./pages/itemPageAdmin";
@@ -29,6 +29,9 @@ const primaryTheme = createTheme({
     primary: {
       main: PRIMARY,
     },
+  },
+  typography: {
+    fontFamily: ["Poppins", "-apple-system", "Roboto"].join(","),
   },
 });
 

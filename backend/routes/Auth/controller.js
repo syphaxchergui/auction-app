@@ -1,5 +1,6 @@
 import { findUserByEmail } from "./service.js";
 import ErrorResponse from "../../utils/errorResponse.js";
+import { updateUserParams } from "../UserParams/service.js";
 
 export const login = (req, res, next) => {
   try {
@@ -23,6 +24,21 @@ export const login = (req, res, next) => {
         email: user.email,
         role: user.role,
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    const userParams = await updateUserParams(req.body.userId, {
+      subscription: "",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "You are successfully logged out",
     });
   } catch (err) {
     next(err);

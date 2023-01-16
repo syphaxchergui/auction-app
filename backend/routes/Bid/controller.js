@@ -1,6 +1,7 @@
 import e from "express";
 import ErrorResponse from "../../utils/errorResponse.js";
 import { findItemAutobids } from "../AutoBid/service.js";
+import { sendNotification } from "../Notifications/controller.js";
 import { findUserParams, updateUserParams } from "../UserParams/service.js";
 import {
   createBid,
@@ -77,7 +78,6 @@ export const autobidding = async (req, res, next) => {
     //update the user params reservedAmout = reservedAmount - highestBid + 1
     //if(alertBid) send notification to the user
 
-
     let autobid;
 
     //if the autobidding stops after each one of the users that activated the autobidding
@@ -122,6 +122,14 @@ export const autobidding = async (req, res, next) => {
           (userParams?.reservedAmount || 0) + highestBid.amount + 1;
         const maxBidAmount = userParams?.maxBidAmount;
 
+        //send notification of the max bid amount is reached
+        if (userParams?.maxBidAmount == userParams?.reservedAmount)
+          sendNotification(
+            highestBid.userId,
+            "Max Bid amount is reached !",
+            `You've reached 100% of your maximum bid amount`
+          );
+
         if (
           autobid.userId !== highestBid.userId &&
           reservedAmontAfterBidding <= maxBidAmount
@@ -147,6 +155,18 @@ export const autobidding = async (req, res, next) => {
     const updatedUserParams = await updateUserParams(highestBid.userId, {
       reservedAmount: (userParams?.reservedAmount || 0) + highestBid.amount,
     });
+
+    //send notification if alert bid condition is met
+
+    if (
+      (updatedUserParams?.alertBid / 100) * updatedUserParams?.maxBidAmount >=
+      updatedUserParams?.reservedAmount
+    )
+      sendNotification(
+        highestBid.userId,
+        "Alert Bid !",
+        `You've reached ${updatedUserParams?.alertBid}% of your maximum bid amount`
+      );
   } catch (err) {
     next(err);
   }
