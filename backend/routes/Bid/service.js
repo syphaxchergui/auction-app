@@ -36,13 +36,25 @@ export const createBid = async (userId, itemId, amount) => {
   }
 };
 
+export const deleteBidsByItem = async (itemId) => {
+  try {
+    const bids = Bid.deleteMany({ itemId });
+    return bids;
+  } catch (err) {
+    throw new ErrorResponse("An error ocurred when deleting bids", 500);
+  }
+};
+
 export const findMaxBidByItem = async (itemId) => {
   try {
-    const bids = Bid.find({ itemId }, "-__v  -updatedAt").sort({
-      amount: -1,
-    });
+    const bids = await Bid.find({ itemId }, "-__v  -updatedAt")
+      .sort({
+        amount: -1,
+      })
+      .limit(1)
+      .exec();
 
-    return bids;
+    return bids[0];
   } catch (err) {
     throw new ErrorResponse("An error ocurred", 500);
   }

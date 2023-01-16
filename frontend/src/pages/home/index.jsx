@@ -31,7 +31,7 @@ const Home = () => {
       );
       if (result.data?.success) {
         setData(result?.data);
-        console.log(result.data);
+        //console.log(result.data);
       } else {
         notify?.error(result?.data?.message);
       }
@@ -54,9 +54,7 @@ const Home = () => {
           flexDirection: "column",
         }}
       >
-        {isAdmin(user.role) ? (
-          <ItemsList items={data?.items} />
-        ) : viewType === "LIST" ? (
+        {isAdmin(user.role) || viewType === "LIST" ? (
           <ItemsList items={data?.items} />
         ) : (
           <ItemsGrid items={data?.items} />

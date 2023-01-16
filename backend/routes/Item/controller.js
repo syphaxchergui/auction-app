@@ -10,7 +10,8 @@ import {
 } from "./service.js";
 import cloudinary from "../../core/cloudinary.js";
 import slug from "slug";
-import { findMaxBidByItem } from "../Bid/service.js";
+import { deleteBidsByItem, findMaxBidByItem } from "../Bid/service.js";
+import { deleteAutobidsByItem, findAutobid } from "../AutoBid/service.js";
 
 export const getAllItems = async (req, res, next) => {
   try {
@@ -44,13 +45,25 @@ export const getItemBySlug = async (req, res, next) => {
         404
       );
 
-    const maxBidArray = await findMaxBidByItem(item._id);
-    const maxBid = maxBidArray[0];
+    const maxBid = await findMaxBidByItem(item._id);
+
+    var autobidding;
+
+    if (req.query.userId) {
+      const autobid = await findAutobid(item._id, req.query.userId);
+      if (autobid) {
+        autobidding = true;
+      } else {
+        autobidding = false;
+      }
+    }
+
     return res.status(200).json({
       success: true,
       message: "Item by slug",
       item,
       maxBid,
+      autobidding,
     });
   } catch (err) {
     next(err);
@@ -131,6 +144,8 @@ export const removeItemBySlug = async (req, res, next) => {
       );
 
     const deletedItem = await deleteItemBySlug(req.params.slug);
+    const deletedBids = await deleteBidsByItem(item._id);
+    const deletedAutobids = await deleteAutobidsByItem(item._id);
 
     return res.status(200).json({
       success: true,

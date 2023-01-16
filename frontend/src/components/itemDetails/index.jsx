@@ -7,6 +7,8 @@ import ApiMiddleware from "../../core/API";
 import { useAuth } from "../../state/context/AuthContext";
 import { useNotifications } from "../../state/context/NotificationContext";
 import Checkbox from "@mui/material/Checkbox";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 import "./styles.css";
 
@@ -24,9 +26,10 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
   }
 };
 
-const ItemDetails = ({ item, maxBid }) => {
+const ItemDetails = ({ item, maxBid, autobidding }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isAutobidding, setIsAutobidding] = useState(autobidding);
   const [formErrors, setFormErrors] = useState({
     amount: "",
   });
@@ -86,6 +89,43 @@ const ItemDetails = ({ item, maxBid }) => {
       notify.error(error?.response?.data?.message || error.message);
     }
   };
+
+  const activateAutobidding = async () => {
+    try {
+      const result = await ApiMiddleware.post("/autobids", {
+        userId: user?.id,
+        itemId: item?._id,
+      });
+      if (result.data.success) {
+        notify.success(result?.data?.message);
+      } else {
+        notify.error(result?.data?.message);
+      }
+    } catch (error) {
+      notify.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  const deactivateAutobidding = async () => {
+    try {
+      const result = await ApiMiddleware.delete(
+        `/autobids/${user?.id}/${item?._id}`
+      );
+      if (result.data.success) {
+        notify.success(result?.data?.message);
+      } else {
+        notify.error(result?.data?.message);
+      }
+    } catch (error) {
+      notify.error(error?.response?.data?.message || error.message);
+    }
+  };
+
+  const handleChange = (event) => {
+    setIsAutobidding(event.target.checked);
+    if (event.target.checked) activateAutobidding();
+    else deactivateAutobidding();
+  };
   return (
     <Grid container columnSpacing={5}>
       <Grid item xs={12} md={5}>
@@ -133,7 +173,12 @@ const ItemDetails = ({ item, maxBid }) => {
             <Grid item xs={6}>
               <p className="item-d-subtitle">Options</p>
 
-              <FormControlLabel control={<Checkbox />} label="Auto-bidding" />
+              <FormControlLabel
+                control={
+                  <Checkbox checked={isAutobidding} onChange={handleChange} />
+                }
+                label="Auto-bidding"
+              />
             </Grid>
           </Grid>
         </div>

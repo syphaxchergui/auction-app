@@ -12,14 +12,15 @@ import {
   PRIMARY_LIGHT_2,
   PRIMARY_LIGHT_3,
 } from "../../constant/colors";
+import { useAuth } from "../../state/context/AuthContext";
 
 const ItemPage = () => {
   const params = useParams();
   const { actions: notify } = useNotifications();
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
-  const [maxBid, setMaxBid] = useState(null);
 
   useEffect(() => {
     getData();
@@ -28,10 +29,11 @@ const ItemPage = () => {
   const getData = async () => {
     try {
       setLoading(true);
-      const result = await ApiMiddleware.get(`/items/${params?.slug}`);
+      const result = await ApiMiddleware.get(
+        `/items/${params?.slug}?userId=${user?.id}`
+      );
       if (result.data?.success) {
         setData(result?.data);
-        //console.log(result?.data);
       } else {
         notify?.error(result?.data?.message);
       }
@@ -57,6 +59,7 @@ const ItemPage = () => {
 
       <ItemDetails
         item={data?.item}
+        autobidding={data?.autobidding}
         maxBid={data?.maxBid || { amount: "--" }}
       />
 

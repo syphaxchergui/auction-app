@@ -17,6 +17,14 @@ export const users = {
       token: "f67a0ebc19d3f9debbf556ca8b645c94",
     },
     {
+      id: 54320,
+      fullname: "User 3",
+      email: "user3@gmail.com",
+      password: "password",
+      role: "USER",
+      token: "f67a0ebc19d3f9dec478d836ea97cfdd",
+    },
+    {
       id: 54323,
       fullname: "Admin 1",
       email: "admin1@gmail.com",

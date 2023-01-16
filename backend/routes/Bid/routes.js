@@ -5,6 +5,7 @@ import {
   addNewBid,
   getAllBidsUserProduct,
   getAllBidsProduct,
+  autobidding,
 } from "./controller.js";
 import { addBidSchema } from "./schema.js";
 
@@ -16,6 +17,7 @@ router.post(
   "/",
   validate(addBidSchema, ValidationSource.BODY),
   addNewBid,
+  autobidding,
   errorHandler
 );
 
