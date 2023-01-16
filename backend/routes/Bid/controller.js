@@ -1,3 +1,4 @@
+import e from "express";
 import ErrorResponse from "../../utils/errorResponse.js";
 import { findItemAutobids } from "../AutoBid/service.js";
 import { findUserParams, updateUserParams } from "../UserParams/service.js";
@@ -80,50 +81,74 @@ export const autobidding = async (req, res, next) => {
     console.log(autobids);
 
     let autobid;
-    for (let i = 0; i < autobids.length; i++) {
-      autobid = autobids[i];
-      const userParams = await findUserParams(autobid.userId);
-      const highestBid = await findMaxBidByItem(itemId);
 
-      if (autobid.userId !== highestBid.userId) {
-        const bid = await createBid(
-          autobid.userId,
-          itemId,
-          highestBid.amount + 1
-        );
+    //if the autobidding stops after each one of the users that activated the autobidding
+    //for an item made one auto bid we use the commented code below
 
-        console.log("auto bid created: ", bid);
-        if (bid) {
-          const updatedUserParams = await updateUserParams(userId, {
-            reservedAmount:
-              (userParams?.reservedAmount || 0) + highestBid.amount + 1,
-          });
-          console.log("updated user params: ", updatedUserParams);
-        }
-      }
-    }
+    // Start
+    // for (let i = 0; i < autobids.length; i++) {
+    //   autobid = autobids[i];
 
-    // autobids.map(async (autobid) => {
     //   const userParams = await findUserParams(autobid.userId);
     //   const highestBid = await findMaxBidByItem(itemId);
+    //   const reservedAmontAfterBidding =
+    //     (userParams?.reservedAmount || 0) + highestBid.amount + 1;
+    //   const maxBidAmount = userParams?.maxBidAmount;
 
-    //   if (autobid.userId !== highestBid.userId) {
+    //   if (
+    //     autobid.userId !== highestBid.userId &&
+    //     reservedAmontAfterBidding <= maxBidAmount
+    //   ) {
     //     const bid = await createBid(
     //       autobid.userId,
     //       itemId,
     //       highestBid.amount + 1
     //     );
 
-    //     console.log("auto bid created: ", bid);
     //     if (bid) {
-    //       const updatedUserParams = await updateUserParams(userId, {
-    //         reservedAmount:
-    //           (userParams?.reservedAmount || 0) + highestBid.amount + 1,
-    //       });
-    //       console.log("updated user params: ", updatedUserParams);
     //     }
     //   }
-    // });
+    // }
+    // END
+
+    //else if the autobidding stops after the users don't have enough reserve we use the code below
+    let stop = false;
+
+    while (!stop) {
+      for (let i = 0; i < autobids.length; i++) {
+        autobid = autobids[i];
+
+        const userParams = await findUserParams(autobid.userId);
+        const highestBid = await findMaxBidByItem(itemId);
+        const reservedAmontAfterBidding =
+          (userParams?.reservedAmount || 0) + highestBid.amount + 1;
+        const maxBidAmount = userParams?.maxBidAmount;
+
+        if (
+          autobid.userId !== highestBid.userId &&
+          reservedAmontAfterBidding <= maxBidAmount
+        ) {
+          stop = false;
+          const bid = await createBid(
+            autobid.userId,
+            itemId,
+            highestBid.amount + 1
+          );
+
+          if (bid) {
+          }
+        } else {
+          stop = true;
+        }
+      }
+    }
+
+    //get highest bidder and update his reserved amount
+    const highestBid = await findMaxBidByItem(itemId);
+    const userParams = await findUserParams(highestBid.userId);
+    const updatedUserParams = await updateUserParams(highestBid.userId, {
+      reservedAmount: (userParams?.reservedAmount || 0) + highestBid.amount,
+    });
   } catch (err) {
     next(err);
   }

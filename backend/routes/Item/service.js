@@ -23,7 +23,6 @@ export const findAllItemsWithPagination = async (currentPage, perPage) => {
 
     const count = await Item.count().exec();
 
-    //console.log(items);
     return {
       items,
       page: page,

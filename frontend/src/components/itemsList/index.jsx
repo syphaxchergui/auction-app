@@ -1,4 +1,10 @@
-import { Avatar, Button, Grid, Pagination } from "@mui/material";
+import {
+  Avatar,
+  Button,
+  Grid,
+  Pagination,
+  TableSortLabel,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import Item from "../item";
 import Table from "@mui/material/Table";
@@ -84,7 +90,43 @@ const ListToolBox = ({ isAdmin, slug }) => {
 
 const ItemsList = ({ items }) => {
   const { user } = useAuth();
+  const [order, setOrder] = useState("");
 
+  function descendingComparator(a, b, orderBy) {
+    if (b[orderBy] < a[orderBy]) {
+      return -1;
+    }
+    if (b[orderBy] > a[orderBy]) {
+      return 1;
+    }
+    return 0;
+  }
+
+  function getComparator(order, orderBy) {
+    return order === "desc"
+      ? (a, b) => descendingComparator(a, b, orderBy)
+      : (a, b) => -descendingComparator(a, b, orderBy);
+  }
+
+  function stableSort(array, comparator) {
+    const stabilizedThis = array.map((el, index) => [el, index]);
+    stabilizedThis.sort((a, b) => {
+      const order = comparator(a[0], b[0]);
+      if (order !== 0) {
+        return order;
+      }
+      return a[1] - b[1];
+    });
+    return stabilizedThis.map((el) => el[0]);
+  }
+
+  const handleSort = () => {
+    if (order === "asc") {
+      setOrder("desc");
+    } else {
+      setOrder("asc");
+    }
+  };
   return (
     <TableContainer sx={{ my: 4 }} component={Paper}>
       <Table aria-label="simple table">
@@ -92,13 +134,24 @@ const ItemsList = ({ items }) => {
           <TableRow>
             <TableCell>Image</TableCell>
             <TableCell>Item</TableCell>
-            <TableCell>Min Bid&nbsp;($)</TableCell>
+            <TableCell>
+              <TableSortLabel
+                active={order !== ""}
+                direction={order !== "" ? order : "asc"}
+                onClick={handleSort}
+              >
+                Min Bid&nbsp;($)
+              </TableSortLabel>
+            </TableCell>
             <TableCell>Close Date</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {items?.map((row) => (
+          {(order !== ""
+            ? stableSort(items, getComparator(order, "minBid"))
+            : items
+          )?.map((row) => (
             <TableRow
               key={row._id}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

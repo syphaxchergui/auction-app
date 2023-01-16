@@ -1,7 +1,7 @@
 import { Add, GridView, Search, ViewList } from "@mui/icons-material";
-import { Button, IconButton, InputAdornment, TextField } from "@mui/material";
+import { Button, IconButton, TextField } from "@mui/material";
 import { useState } from "react";
-import { createSearchParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "../../state/context/UserContext";
 import "./styles.css";
 const HomeToolBox = ({ isAdmin }) => {
@@ -31,8 +31,13 @@ const HomeToolBox = ({ isAdmin }) => {
           value={search}
           type="search"
         />
-        <IconButton onClick={goToSearchScreen} sx={{ ml: 1 }}>
-          <Search color="primary" />
+        <IconButton
+          disabled={search === ""}
+          onClick={goToSearchScreen}
+          sx={{ ml: 1 }}
+          color="primary"
+        >
+          <Search />
         </IconButton>
       </div>
       {isAdmin ? (

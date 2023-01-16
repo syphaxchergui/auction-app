@@ -8,3 +8,12 @@ export const addBidSchema = Joi.object({
   userId: Joi.number().required(),
   amount: Joi.number().required(),
 });
+
+export const getAllBidsUserProductSchema = Joi.object({
+  userId: Joi.number().required(),
+  itemId: validateObjectId().required(),
+});
+
+export const getAllBidsProductSchema = Joi.object({
+  itemId: validateObjectId().required(),
+});

@@ -195,6 +195,7 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
             />
             <LoadingButton
               loading={loading}
+              disabled={maxBid?.userId === user?.id}
               disableElevation
               sx={{ width: 200, ml: 2, height: 56 }}
               variant="contained"

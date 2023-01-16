@@ -17,7 +17,12 @@ export const login = (req, res, next) => {
       success: true,
       message: "You are successfully logged in",
       token: user.token,
-      user,
+      user: {
+        id: user.id,
+        fullname: user.fullname,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (err) {
     next(err);

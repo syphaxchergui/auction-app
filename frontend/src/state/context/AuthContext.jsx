@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [state, setState] = useState(initialState);
   const [storedToken, storeToken] = useToken("_token");
   const { actions: notify } = useNotifications();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!state.loggedin) storeToken({ user: undefined, token: undefined });
@@ -84,6 +85,7 @@ export const AuthProvider = ({ children }) => {
         user: null,
         token: null,
       };
+      navigate("/");
       setState({ ...state, ...data, loading: false, loggedin: false });
     } catch (err) {
       setState({ ...state, loading: false, error: err.message });
