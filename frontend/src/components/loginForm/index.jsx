@@ -70,7 +70,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="l-section-tf">
+    <form className="l-section-tf" onSubmit={(e) => handleSubmit(e)}>
       <>
         <TextField
           fullWidth
@@ -133,13 +133,14 @@ const LoginForm = () => {
         sx={{ marginTop: "4em", height: 46 }}
         variant="contained"
         fullWidth
+        type="submit"
         loading={loading}
         onClick={handleSubmit}
         disableElevation
       >
         Login
       </LoadingButton>
-    </div>
+    </form>
   );
 };
 

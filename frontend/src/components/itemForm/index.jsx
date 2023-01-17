@@ -1,4 +1,4 @@
-import { Button, TextField } from "@mui/material";
+import { Button, FormHelperText, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { useEffect, useState } from "react";
@@ -22,6 +22,7 @@ const ItemForm = ({ isEditing }) => {
     title: "",
     description: "",
     minimumBid: "",
+    selectedFile: "",
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -89,13 +90,18 @@ const ItemForm = ({ isEditing }) => {
     } else if (formData.minimumBid < 1) {
       (errors["minimumBid"] = "Minimum Bid must be > 0"), (hasErrors = true);
     }
+
+    if (!formData.selectedFile) {
+      (errors["selectedFile"] = "You must choose an image !"),
+        (hasErrors = true);
+    }
     return { hasErrors, errors };
   };
 
   const submitItem = async (event) => {
     event.preventDefault();
 
-    const { hasErrors, errors } = validateForm(formData);
+    const { hasErrors, errors } = validateForm({ ...formData, selectedFile });
     if (hasErrors) {
       setFormErrors(errors);
       return;
@@ -236,6 +242,9 @@ const ItemForm = ({ isEditing }) => {
                 accept="image/*"
               />
             </Button>
+            {formErrors.selectedFile !== "" ? (
+              <FormHelperText>{formErrors.selectedFile}</FormHelperText>
+            ) : null}
             <LoadingButton
               disableElevation
               type="submit"
