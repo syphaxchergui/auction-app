@@ -85,3 +85,22 @@ The app uses dummy user authentication implemented into the system with hardcode
 - **password:** password
 
 ---
+
+# Screenshots
+
+## Login Screen
+
+![Alt text](./screenshots/login_screen.png "Login")
+
+## User Screens
+
+![Alt text](./screenshots/gallery_view_user.png "Gallery")
+![Alt text](./screenshots/list_view_user.png "List")
+![Alt text](./screenshots/search_screen.png "Search")
+![Alt text](./screenshots/settings_screen.png "Settings")
+
+## Admin Screens
+
+![Alt text](./screenshots/list_view_admin.png "List admin")
+![Alt text](./screenshots/create_new_item_admin.png "Create new item")
+![Alt text](./screenshots/product_screen_admin.png "Details")
