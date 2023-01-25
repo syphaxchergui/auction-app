@@ -9,7 +9,7 @@ import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import { ListItemIcon, ListItemText } from "@mui/material";
-import { Settings } from "@mui/icons-material";
+import { Person, Settings } from "@mui/icons-material";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../state/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -23,6 +23,11 @@ function CustomAppBar() {
 
   const goToSettings = () => {
     navigate("/settings", { replace: true });
+    handleCloseUserMenu();
+  };
+
+  const goToProfile = () => {
+    navigate("/profile", { replace: true });
     handleCloseUserMenu();
   };
 
@@ -91,12 +96,20 @@ function CustomAppBar() {
               onClose={handleCloseUserMenu}
             >
               {isAdmin(user?.role) ? null : (
-                <MenuItem onClick={goToSettings}>
-                  <ListItemIcon>
-                    <Settings fontSize="small" />
-                  </ListItemIcon>
-                  <ListItemText>Settings</ListItemText>
-                </MenuItem>
+                <div>
+                  <MenuItem onClick={goToProfile}>
+                    <ListItemIcon>
+                      <Person fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Profile</ListItemText>
+                  </MenuItem>
+                  <MenuItem onClick={goToSettings}>
+                    <ListItemIcon>
+                      <Settings fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText>Settings</ListItemText>
+                  </MenuItem>
+                </div>
               )}
               <MenuItem onClick={actions?.logout}>
                 <ListItemIcon>

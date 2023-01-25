@@ -23,6 +23,7 @@ import NewItem from "./pages/newItem";
 import EditItem from "./pages/editItem";
 import Settings from "./pages/settings";
 import Search from "./pages/search";
+import Profile from "./pages/profile";
 
 const primaryTheme = createTheme({
   palette: {
@@ -68,6 +69,7 @@ const App = () => {
       <Route exact path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="/items/:slug" element={<ItemPage />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/search" element={<Search />} />
         <Route path="*" element={<NotFound />} />

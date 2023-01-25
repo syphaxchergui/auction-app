@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "./AuthContext";
 
 const VIEW_TYPES = ["GRID", "LIST"];
 
@@ -14,6 +13,7 @@ const initialState = {
   selectedUserIndex: 0,
   error: "",
   viewType: "GRID",
+  socket: null,
 };
 
 const UserContext = React.createContext(initialState);
@@ -40,6 +40,10 @@ export const UserProvider = ({ children }) => {
   function setViewType(type) {
     setState({ ...state, viewType: type });
   }
+
+  function setSocket(socket) {
+    setState({ ...state, socket: socket });
+  }
   return (
     <UserContext.Provider
       value={{
@@ -50,6 +54,7 @@ export const UserProvider = ({ children }) => {
           previousPage,
           setLoading,
           setViewType,
+          setSocket,
         },
       }}
     >

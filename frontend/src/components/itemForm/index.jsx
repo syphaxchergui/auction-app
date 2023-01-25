@@ -66,6 +66,34 @@ const ItemForm = ({ isEditing }) => {
     setDate(newValue);
   };
 
+  const validateFormEdit = (formData) => {
+    const errors = {
+      title: "",
+      description: "",
+      minimumBid: "",
+    };
+    let hasErrors = false;
+    if (formData.title.length === 0) {
+      errors["title"] = "title is required";
+      hasErrors = true;
+    }
+
+    if (formData.description.length === 0) {
+      (errors["description"] = "Description is required"), (hasErrors = true);
+    }
+
+    if (formData.minimumBid.length === 0) {
+      (errors["minimumBid"] = "Minimum Bid is required"), (hasErrors = true);
+    } else if (isNaN(formData.minimumBid)) {
+      (errors["minimumBid"] = "Minimum Bid must be valide number"),
+        (hasErrors = true);
+    } else if (formData.minimumBid < 1) {
+      (errors["minimumBid"] = "Minimum Bid must be > 0"), (hasErrors = true);
+    }
+
+    return { hasErrors, errors };
+  };
+
   const validateForm = (formData) => {
     const errors = {
       title: "",
@@ -131,12 +159,13 @@ const ItemForm = ({ isEditing }) => {
   };
 
   const updateItem = async () => {
-    const { hasErrors, errors } = validateForm(formData);
+    console.log(0);
+    const { hasErrors, errors } = validateFormEdit(formData);
     if (hasErrors) {
       setFormErrors(errors);
       return;
     }
-
+    console.log(1);
     try {
       setLoading(true);
       let updates = {};
@@ -153,8 +182,10 @@ const ItemForm = ({ isEditing }) => {
       if (new Date(data?.item["expirationDate"]) !== date) {
         updates.expirationDate = date;
       }
+      console.log(2);
 
       const result = await ApiMiddleware.put(`/items/${state.slug}`, updates);
+      console.log(result);
       if (result.data?.success) {
         notify.success(result.data?.message);
         navigate("/");
@@ -162,6 +193,7 @@ const ItemForm = ({ isEditing }) => {
         notify.error(result.data?.message);
       }
     } catch (error) {
+      console.log(error);
       notify.error(error?.response?.data?.message || error.message);
     }
   };
@@ -211,7 +243,6 @@ const ItemForm = ({ isEditing }) => {
         {isEditing ? (
           <LoadingButton
             disableElevation
-            type="submit"
             variant="contained"
             fullWidth
             loading={loading}

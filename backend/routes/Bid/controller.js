@@ -1,5 +1,7 @@
 import e from "express";
+import { io } from "../../server.js";
 import ErrorResponse from "../../utils/errorResponse.js";
+import { STATUSES } from "../../utils/status.js";
 import { findItemAutobids } from "../AutoBid/service.js";
 import { sendNotification } from "../Notifications/controller.js";
 import { findUserParams, updateUserParams } from "../UserParams/service.js";
@@ -8,6 +10,8 @@ import {
   findBidUserProduct,
   findBidProduct,
   findMaxBidByItem,
+  findBidUserAsItems,
+  addStatusToBids,
 } from "./service.js";
 
 export const getAllBidsUserProduct = async (req, res, next) => {
@@ -19,6 +23,24 @@ export const getAllBidsUserProduct = async (req, res, next) => {
       success: true,
       message: "Items list",
       bids,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getAllBidsUser = async (req, res, next) => {
+  try {
+    const result = await findBidUserAsItems(req.params.userId);
+    if (!result || result.length === 0)
+      throw new ErrorResponse("No bids found", 404);
+
+    const items = await addStatusToBids(result);
+
+    return res.status(200).json({
+      success: true,
+      message: "Items list",
+      items,
     });
   } catch (err) {
     next(err);
@@ -46,11 +68,17 @@ export const addNewBid = async (req, res, next) => {
       req.body.itemId,
       req.body.amount
     );
+    const highestBid = await findMaxBidByItem(req.body.itemId);
 
     res.status(200).json({
       success: true,
       message: "Bid created successfully",
       bid,
+    });
+
+    io.emit("createBidResponse", {
+      message: "User" + req.body.userId + " created a bid",
+      highestBid: highestBid,
     });
 
     //call the autobidding function
@@ -60,8 +88,9 @@ export const addNewBid = async (req, res, next) => {
   }
 };
 
-export const autobidding = async (req, res, next) => {
+export const autobidding = async (err, req, res, next) => {
   try {
+    if (err) throw new ErrorResponse("Server Error", 500);
     const { itemId, userId } = req.body;
     //Auto Bid feature
     //First we get all autobids we have on the Item

@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import routes from "./routes/index.js";
 import mongoose from "mongoose";
 import bodyParser from "body-parser";
+import { Server } from "socket.io";
+import { createServer } from "http";
 
 dotenv.config();
 
@@ -21,8 +23,22 @@ app.use(helmet());
 // for cross origin security
 app.use(cors());
 
+const httpServer = createServer(app);
+export const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+  },
+});
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+io.on("connection", (socket) => {
+  console.log(`⚡: ${socket.id} user just connected!`);
+  socket.on("disconnect", () => {
+    console.log("🔥: A user disconnected");
+  });
+});
 
 app.use("/api", routes);
 
@@ -37,7 +53,7 @@ app.use((err, req, res, next) => {
 });
 
 //Server listening
-app.listen(port, async () => {
+httpServer.listen(port, async () => {
   console.log(`Server running on port ${port}`);
 });
 

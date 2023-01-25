@@ -11,6 +11,10 @@ import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 
 import "./styles.css";
+import { io } from "socket.io-client";
+import { useUser } from "../../state/context/UserContext";
+
+const socket = io("http://localhost:5000");
 
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
   if (completed) {
@@ -29,6 +33,7 @@ const renderer = ({ days, hours, minutes, seconds, completed }) => {
 const ItemDetails = ({ item, maxBid, autobidding }) => {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
+  const [highestBid, setHighestBid] = useState(maxBid);
   const [isAutobidding, setIsAutobidding] = useState(autobidding);
   const [formErrors, setFormErrors] = useState({
     amount: "",
@@ -36,6 +41,14 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
   const { user } = useAuth();
   const { actions: notify } = useNotifications();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    socket.on("createBidResponse", (data) => {
+      setAmount("");
+      notify.success(data?.message);
+      setHighestBid(data?.highestBid);
+    });
+  }, [socket]);
 
   const validateForm = (formData) => {
     const errors = {
@@ -48,14 +61,14 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
     } else if (isNaN(formData.amount)) {
       errors["amount"] = "Amount must be a valide number";
       hasErrors = true;
-    } else if (maxBid.amount !== "--" && formData.amount < item?.minBid) {
+    } else if (highestBid.amount !== "--" && formData.amount < item?.minBid) {
       errors["amount"] = `Amount must be > minimum Bid ${item?.minBid}`;
       hasErrors = true;
-    } else if (maxBid.amount === "--" && formData.amount < item?.minBid) {
+    } else if (highestBid.amount === "--" && formData.amount < item?.minBid) {
       errors["amount"] = `Amount must be > minimum Bid ${item?.minBid}`;
       hasErrors = true;
-    } else if (maxBid.amount > 0 && formData.amount <= maxBid?.amount) {
-      errors["amount"] = `Amount must be > Highest Bid ${maxBid?.amount}`;
+    } else if (highestBid.amount > 0 && formData.amount <= highestBid?.amount) {
+      errors["amount"] = `Amount must be > Highest Bid ${highestBid?.amount}`;
       hasErrors = true;
     }
 
@@ -78,8 +91,6 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
       });
       if (result.data.success) {
         notify.success(result?.data?.message);
-
-        setTimeout(() => navigate(0), 1000);
       } else {
         notify.error(result?.data?.message);
       }
@@ -163,11 +174,12 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
           <Grid container>
             <Grid item xs={6}>
               <p className="item-d-subtitle">
-                Highest bid {maxBid?.userId === user?.id ? "(Your Bid)" : null}
+                Highest bid{" "}
+                {highestBid?.userId === user?.id ? "(Your Bid)" : null}
               </p>
               <h1 className="item-d-bid">
                 <span className="item-d-bid-dollar">$ </span>
-                {maxBid?.amount}
+                {highestBid?.amount}
               </h1>
             </Grid>
             <Grid item xs={6}>
@@ -195,7 +207,7 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
             />
             <LoadingButton
               loading={loading}
-              disabled={maxBid?.userId === user?.id}
+              disabled={highestBid?.userId === user?.id}
               disableElevation
               sx={{ width: 200, ml: 2, height: 56 }}
               variant="contained"
