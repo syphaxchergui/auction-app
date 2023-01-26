@@ -16,12 +16,16 @@ import { useNavigate } from "react-router-dom";
 import Chip from "@mui/material/Chip";
 import { Receipt } from "@mui/icons-material";
 
-const ActionsToolBox = ({ slug, status }) => {
+const ActionsToolBox = ({ slug, status, id }) => {
   const navigate = useNavigate();
 
   const goToDetails = () => {
     navigate(`/items/${slug}`);
   };
+  const goToBill = () => {
+    navigate(`/bill/${id}`);
+  };
+
   return (
     <Box sx={{ display: "flex", gap: 2 }}>
       <Button onClick={goToDetails} disableElevation variant="contained">
@@ -30,7 +34,7 @@ const ActionsToolBox = ({ slug, status }) => {
       {status === "won" ? (
         <Button
           startIcon={<Receipt />}
-          onClick={goToDetails}
+          onClick={goToBill}
           disableElevation
           variant="outlined"
         >
@@ -171,7 +175,11 @@ const AllMyBids = () => {
                     <StatusChip status={row?.status} />
                   </TableCell>
                   <TableCell width={250}>
-                    <ActionsToolBox slug={row?.slug} status={row?.status} />
+                    <ActionsToolBox
+                      slug={row?.slug}
+                      status={row?.status}
+                      id={row?._id}
+                    />
                   </TableCell>
                 </TableRow>
               ))

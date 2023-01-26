@@ -7,11 +7,15 @@ import {
   deleteItemBySlug,
   updateItem,
   findItemsBySearch,
+  findItemById,
 } from "./service.js";
 import cloudinary from "../../core/cloudinary.js";
 import slug from "slug";
 import { deleteBidsByItem, findMaxBidByItem } from "../Bid/service.js";
 import { deleteAutobidsByItem, findAutobid } from "../AutoBid/service.js";
+import { io } from "../../server.js";
+import { closedBidJob, updateClosedBidJob } from "../../jobs/closedBidJob.js";
+import { scheduledJobs } from "node-schedule";
 
 export const getAllItems = async (req, res, next) => {
   try {
@@ -21,6 +25,7 @@ export const getAllItems = async (req, res, next) => {
     );
     if (!result?.items || result?.items?.length === 0)
       throw new ErrorResponse("No items found", 404);
+
     return res.status(200).json({
       success: true,
       message: "Items list",
@@ -70,6 +75,31 @@ export const getItemBySlug = async (req, res, next) => {
   }
 };
 
+export const getItemById = async (req, res, next) => {
+  try {
+    if (!req.params.itemId) {
+      throw new ErrorResponse("itemId not valid", 422);
+    }
+    const item = await findItemById(req.params.itemId);
+    if (!item)
+      throw new ErrorResponse(
+        `No item with id ${req.params.itemId} found`,
+        404
+      );
+
+    const maxBid = await findMaxBidByItem(item._id);
+
+    return res.status(200).json({
+      success: true,
+      message: "Item by slug",
+      item,
+      maxBid,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const updateItemBySlug = async (req, res, next) => {
   try {
     if (!req.params.slug) {
@@ -83,6 +113,12 @@ export const updateItemBySlug = async (req, res, next) => {
       );
 
     const newItem = await updateItem(item._id, req.body);
+
+    if (req.body?.expirationDate)
+      updateClosedBidJob(newItem.slug, newItem.expirationDate, {
+        title: newItem.title,
+        itemId: newItem._id,
+      });
 
     return res.status(200).json({
       success: true,
@@ -105,6 +141,11 @@ export const addNewItem = async (req, res, next) => {
       req.body.description,
       result.url
     );
+
+    closedBidJob(item?.slug, req.body.expirationDate, {
+      title: req.body.title,
+      itemId: item?._id,
+    });
 
     return res.status(200).json({
       success: true,

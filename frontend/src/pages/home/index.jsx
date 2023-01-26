@@ -1,7 +1,9 @@
 import { Pagination } from "@mui/material";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import HomeToolBox from "../../components/homeToolBox";
+import { socket } from "../../components/itemDetails";
 import ItemsGrid from "../../components/itemsGrid";
 import ItemsList from "../../components/itemsList";
 import ApiMiddleware from "../../core/API";
@@ -20,10 +22,24 @@ const Home = () => {
 
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     getData();
   }, [pagination]);
+
+  useEffect(() => {
+    if (!isAdmin(user.role)) {
+      socket.on("bidClosed", (data) => {
+        console.log(data?.message);
+        notify.success(data?.message);
+
+        if (data?.maxBid?.userId === user?.id) {
+          navigate(`/bill/${data?.maxBid?.itemId}`);
+        }
+      });
+    }
+  }, [socket]);
 
   const getData = async () => {
     try {

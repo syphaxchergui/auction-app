@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import { createServer } from "http";
+import { gracefulShutdown } from "node-schedule";
 
 dotenv.config();
 
@@ -37,6 +38,16 @@ io.on("connection", (socket) => {
   console.log(`⚡: ${socket.id} user just connected!`);
   socket.on("disconnect", () => {
     console.log("🔥: A user disconnected");
+  });
+
+  socket.on("createRoom", (data) => {
+    console.log("User is in room " + data);
+    socket.join(data);
+  });
+
+  socket.on("leaveRoom", (data) => {
+    console.log("User is leaving room " + data);
+    socket.leave(data);
   });
 });
 
@@ -82,9 +93,19 @@ mongoose.connection.on("disconnect", () => {
   console.log("Mongoose default connection disconnected");
 });
 
-process.on("SIGINT", () => {
-  mongoose.connection.close(() => {
-    console.log("Mongoose connection closed");
-    process.exit(0);
-  });
+//gracefully shutdown job
+process.on("SIGINT", function () {
+  gracefulShutdown().then(() =>
+    mongoose.connection.close(() => {
+      console.log("Mongoose connection closed");
+      process.exit(0);
+    })
+  );
 });
+
+// process.on("SIGINT", () => {
+//   mongoose.connection.close(() => {
+//     console.log("Mongoose connection closed");
+//     process.exit(0);
+//   });
+// });

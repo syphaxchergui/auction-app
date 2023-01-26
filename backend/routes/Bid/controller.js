@@ -1,4 +1,6 @@
 import e from "express";
+import { sendEmail } from "../../core/email.js";
+import { users } from "../../data/users.js";
 import { io } from "../../server.js";
 import ErrorResponse from "../../utils/errorResponse.js";
 import { STATUSES } from "../../utils/status.js";
@@ -12,6 +14,7 @@ import {
   findMaxBidByItem,
   findBidUserAsItems,
   addStatusToBids,
+  findBidItemAsUsers,
 } from "./service.js";
 
 export const getAllBidsUserProduct = async (req, res, next) => {
@@ -70,33 +73,55 @@ export const addNewBid = async (req, res, next) => {
     );
     const highestBid = await findMaxBidByItem(req.body.itemId);
 
+    io.to(req.body.itemId).emit("createBidResponse", {
+      message: "User" + req.body.userId + " created a bid",
+      highestBid: highestBid,
+    });
+
     res.status(200).json({
       success: true,
       message: "Bid created successfully",
       bid,
     });
 
-    io.emit("createBidResponse", {
-      message: "User" + req.body.userId + " created a bid",
-      highestBid: highestBid,
-    });
+    //get the list of user with bids on the item
+    const usersBidsItem = await findBidItemAsUsers(bid.itemId);
+
+    if (usersBidsItem)
+      usersBidsItem?.map((uid) => {
+        const user = users.data.find((user) => {
+          return user.id == uid._id;
+        });
+
+        if (user?.id != req.body.userId) {
+          sendEmail(
+            user?.email,
+            "News regarding an item you bid on !",
+            `
+The user${req.body.userId} bid on the item with id: ${req.body.itemId}
+Amount: $${req.body.amount}
+        
+Thank you for using our app, see you soon !
+          `
+          );
+        }
+      });
 
     //call the autobidding function
     next();
   } catch (err) {
-    next(err);
+    throw new ErrorResponse("Server Error", 500);
   }
 };
 
-export const autobidding = async (err, req, res, next) => {
+export const autobidding = async (req, res, next) => {
   try {
-    if (err) throw new ErrorResponse("Server Error", 500);
     const { itemId, userId } = req.body;
     //Auto Bid feature
     //First we get all autobids we have on the Item
     const autobids = await findItemAutobids(itemId);
 
-    if (!autobids) {
+    if (autobids?.length < 1) {
       return;
     }
 
@@ -152,12 +177,25 @@ export const autobidding = async (err, req, res, next) => {
         const maxBidAmount = userParams?.maxBidAmount;
 
         //send notification of the max bid amount is reached
-        if (userParams?.maxBidAmount == userParams?.reservedAmount)
+        if (userParams?.maxBidAmount == userParams?.reservedAmount) {
           sendNotification(
-            highestBid.userId,
+            autobid.userId,
             "Max Bid amount is reached !",
             `You've reached 100% of your maximum bid amount`
           );
+        }
+
+        if (userParams?.maxBidAmount <= highestBid.amount) {
+          const user = users.data.find((user) => {
+            return user.id == autobid.userId;
+          });
+          if (user)
+            sendEmail(
+              user?.email,
+              "Max Bid amount is reached !",
+              `The current bid on item ${itemId} exceeds your maximum auto-bid amount.`
+            );
+        }
 
         if (
           autobid.userId !== highestBid.userId &&
@@ -170,8 +208,12 @@ export const autobidding = async (err, req, res, next) => {
             highestBid.amount + 1
           );
 
-          if (bid) {
-          }
+          const newHighestBid = await findMaxBidByItem(itemId);
+
+          io.to(itemId).emit("createBidResponse", {
+            message: "User" + autobid.userId + " created a bid",
+            highestBid: newHighestBid,
+          });
         } else {
           stop = true;
         }

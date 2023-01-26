@@ -1,3 +1,4 @@
+import { users } from "../../data/users.js";
 import { Bid } from "../../models/bid.js";
 import ErrorResponse from "../../utils/errorResponse.js";
 import { STATUSES } from "../../utils/status.js";
@@ -48,6 +49,27 @@ export const findBidUserAsItems = async (user) => {
     ]);
 
     return bids;
+  } catch (err) {
+    throw new ErrorResponse("Server Error", 500);
+  }
+};
+
+export const findBidItemAsUsers = async (itemId) => {
+  try {
+    const users = await Bid.aggregate([
+      {
+        $match: {
+          itemId: itemId,
+        },
+      },
+      {
+        $group: {
+          _id: "$userId",
+        },
+      },
+    ]);
+    console.log(users);
+    return users;
   } catch (err) {
     throw new ErrorResponse("Server Error", 500);
   }
@@ -125,6 +147,19 @@ export const findMaxBidByItem = async (itemId) => {
       })
       .limit(1)
       .exec();
+
+    let lastBidders;
+
+    if (bids.length > 0) {
+      lastBidders = users.data.filter((u) => {
+        if (u.id === bids[0].userId) return u;
+      });
+      return {
+        ...bids[0]._doc,
+        lastBidder: lastBidders[0]?.fullname,
+        lastBidderEmail: lastBidders[0]?.email,
+      };
+    }
 
     return bids[0];
   } catch (err) {

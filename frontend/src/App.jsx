@@ -24,6 +24,7 @@ import EditItem from "./pages/editItem";
 import Settings from "./pages/settings";
 import Search from "./pages/search";
 import Profile from "./pages/profile";
+import Bill from "./pages/bill";
 
 const primaryTheme = createTheme({
   palette: {
@@ -72,6 +73,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/bill/:id" element={<Bill />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

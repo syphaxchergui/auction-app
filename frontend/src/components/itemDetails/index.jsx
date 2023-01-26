@@ -14,7 +14,7 @@ import "./styles.css";
 import { io } from "socket.io-client";
 import { useUser } from "../../state/context/UserContext";
 
-const socket = io("http://localhost:5000");
+export const socket = io("http://localhost:5000");
 
 const renderer = ({ days, hours, minutes, seconds, completed }) => {
   if (completed) {
@@ -48,6 +48,14 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
       notify.success(data?.message);
       setHighestBid(data?.highestBid);
     });
+  }, [socket]);
+
+  useEffect(() => {
+    socket.emit("createRoom", item._id);
+
+    return () => {
+      socket.emit("leaveRoom", item._id);
+    };
   }, [socket]);
 
   const validateForm = (formData) => {
@@ -175,7 +183,11 @@ const ItemDetails = ({ item, maxBid, autobidding }) => {
             <Grid item xs={6}>
               <p className="item-d-subtitle">
                 Highest bid{" "}
-                {highestBid?.userId === user?.id ? "(Your Bid)" : null}
+                {highestBid?.userId === user?.id
+                  ? "(Your Bid)"
+                  : highestBid?.lastBidder
+                  ? `(${highestBid?.lastBidder})`
+                  : null}
               </p>
               <h1 className="item-d-bid">
                 <span className="item-d-bid-dollar">$ </span>

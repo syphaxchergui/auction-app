@@ -4,6 +4,7 @@ import {
   deleteAutobid,
   findAutobid,
   findItemAutobids,
+  findUserAutobids,
 } from "./service.js";
 
 export const getItemAutobids = async (req, res, next) => {
@@ -24,9 +25,10 @@ export const getItemAutobids = async (req, res, next) => {
 
 export const getUserAutobids = async (req, res, next) => {
   try {
-    const autobids = await findItemAutobids(req.params.userId);
+    const autobids = await findUserAutobids(req.params.userId);
 
-    if (!autobids) throw new ErrorResponse("No autobids found", 404);
+    if (!autobids || autobids.length < 1)
+      throw new ErrorResponse("No autobids found", 404);
 
     return res.status(200).json({
       success: true,

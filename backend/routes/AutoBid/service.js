@@ -14,9 +14,7 @@ export const findItemAutobids = async (itemId) => {
 
 export const findUserAutobids = async (userId) => {
   try {
-    const autobids = AutoBid.find({ userId }, "-__v  -updatedAt").populate(
-      "userId"
-    );
+    const autobids = AutoBid.find({ userId }, "-__v  -updatedAt");
     return autobids;
   } catch (err) {
     throw new ErrorResponse("Server Error", 500);

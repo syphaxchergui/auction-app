@@ -8,6 +8,7 @@ import {
   removeItemBySlug,
   updateItemBySlug,
   searchItems,
+  getItemById,
 } from "./controller.js";
 import { ValidationSource, validate } from "../../utils/validate.js";
 import {
@@ -40,6 +41,8 @@ router.get(
   getItemBySlug,
   errorHandler
 );
+
+router.get("/id/:itemId", getItemById, errorHandler);
 
 router.put(
   "/:slug",

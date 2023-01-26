@@ -2,7 +2,58 @@
 
 A web auction application for an antique items seller. The application will allow users to bid on antique items displayed in the site and admin users to set up items for auction.
 
-# Getting Started
+# New Features (PART 2 Test Task)
+
+## Tools Used
+
+- Real time updates **`socket.io`** ;
+- Sending email **`nodemailer`** ;
+- Scheduling emails ...etc (cron jobs) **`node-schedule`**.
+
+## Nodemailer setup
+
+Go to `.env` file and change the `EMAIL_USERNAME` and the `EMAIL_PASSWORD` to the email address from where email would be sending
+
+Some email screenshots are available inside ./screenshots/email_exemples
+
+For Gmail integration: https://community.nodemailer.com/using-gmail/
+
+## Overview of few new features
+
+- Real-time updates of the latest bid in the Item details + Item award upon action finish :
+  Login as an admin and update the close date of an item to 2 or 3 min from now, Open two tabs with two different users, bid from the two users, the highest bid and the last bidder updates in real-time. Once the biding is closed, the winner gets redirected to the bill page (+Email), and the other gets a message(+Email)
+
+- Profile page : In this page the user can see the items he bid on, there status, details and if he won that bid he can generate a bill.
+
+- Email notifications: email are sent when the bidding is closed, when the max bid is reached, bid is made from another user...
+
+## Docker deployment
+
+### Backend
+
+The backend is deployed using docker. An image is available here: https://hub.docker.com/r/syphax0808/auction-app-backend
+
+`docker run -p 49160:5000 -d syphax0808/auction-app-backend`
+
+### Frontend
+
+The Frontend is deployed using docker. An image is available here: https://hub.docker.com/r/syphax0808/auction-app-frontend
+
+`docker run -p 5173:5173 -d syphax0808/auction-app-frontend`
+
+The app will be available at http://0.0.0.0:5173
+
+## Postman documentation
+
+This is the link to the postman documentation for the API https://documenter.getpostman.com/view/15078593/2s8ZDeSJaU
+
+## New Pages screenshots
+
+![Alt text](./screenshots/bill_exemple.png "Bill")
+![Alt text](./screenshots/profile_page.png "Profile page")
+![Alt text](./screenshots/profile_page_filters.png "Profile page filters")
+
+# PART 1 Test Task
 
 ## Tools Used
 
